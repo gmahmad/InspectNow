@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="InspectNow.Api/InspectNow.Api.csproj" />
+    <Project Path="InspectNow.Application/InspectNow.Application.csproj" />
+    <Project Path="InspectNow.Domain/InspectNow.Domain.csproj" />
+    <Project Path="InspectNow.Infrastructure/InspectNow.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="InspectNow.Tests/InspectNow.Tests.csproj" />
+  </Folder>
+</Solution>
