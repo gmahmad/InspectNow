@@ -1,6 +1,30 @@
+using InspectNow.Application.Templates;
+using InspectNow.Infrastructure.Persistence;
+using InspectNow.Infrastructure.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString =
+    builder.Configuration.GetConnectionString("InspectNow");
+
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Connection string 'InspectNow' is missing.");
+}
+
 // Add services to the container.
+
+builder.Services.AddDbContext<InspectNowDbContext>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<
+    IInspectionTemplateRepository,
+    InspectionTemplateRepository>();
+
+builder.Services.AddScoped<CreateInspectionTemplate>();
+builder.Services.AddScoped<GetInspectionTemplate>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

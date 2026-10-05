@@ -4,3 +4,29 @@ GET {{InspectNow.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+@baseUrl = https://localhost:7145
+
+### Create a draft inspection template
+POST {{baseUrl}}/api/inspection-templates
+Content-Type: application/json
+
+{
+  "name": "Office Cleaning Inspection"
+}
+
+### Reject a blank name
+POST {{baseUrl}}/api/inspection-templates
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Retrieve the template already created
+GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+Accept: application/json
+
+### Request a nonexistent template
+GET {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000
+Accept: application/json
