@@ -30,3 +30,30 @@ Accept: application/json
 ### Request a nonexistent template
 GET {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000
 Accept: application/json
+
+### Add a question to our existing draft
+POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+Content-Type: application/json
+
+{
+  "text": "Are the floors clean?",
+  "isRequired": true
+}
+
+### Reject blank question text
+POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+Content-Type: application/json
+
+{
+  "text": "   ",
+  "isRequired": true
+}
+
+### Handle a missing template
+POST {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000/questions
+Content-Type: application/json
+
+{
+  "text": "Are the floors clean?",
+  "isRequired": true
+}

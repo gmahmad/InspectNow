@@ -25,6 +25,7 @@ builder.Services.AddScoped<
 
 builder.Services.AddScoped<CreateInspectionTemplate>();
 builder.Services.AddScoped<GetInspectionTemplate>();
+builder.Services.AddScoped<AddTemplateQuestion>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

@@ -50,4 +50,15 @@ public sealed class InspectionTemplateRepository
             template.Name,
             template.Status.ToString());
     }
+
+    public async Task<InspectionTemplate?> GetForUpdateAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.InspectionTemplates
+            .Include(t => t.Questions)
+            .SingleOrDefaultAsync(
+                t => t.Id == id,
+                cancellationToken);
+    }
 }

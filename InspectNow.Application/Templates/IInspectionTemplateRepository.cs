@@ -12,4 +12,8 @@ public interface IInspectionTemplateRepository
     Task<TemplateDetailsResult?> GetDetailsAsync(
         Guid id,
         CancellationToken cancellationToken = default);
+
+    Task<InspectionTemplate?> GetForUpdateAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
 }
