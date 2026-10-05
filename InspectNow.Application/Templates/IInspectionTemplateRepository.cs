@@ -19,4 +19,10 @@ public interface IInspectionTemplateRepository
 
     Task<bool> TrySaveChangesAsync(
     CancellationToken cancellationToken = default);
+
+    Task<TemplatePageResult> ListAsync(
+    TemplateStatus? status,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default);
 }

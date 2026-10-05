@@ -83,4 +83,60 @@ public sealed class InspectionTemplateRepository
             return false;
         }
     }
+
+    public async Task<TemplatePageResult> ListAsync(
+    TemplateStatus? status,
+    int page,
+    int pageSize,
+    CancellationToken cancellationToken = default)
+    {
+        var query = _dbContext.InspectionTemplates.AsQueryable();
+
+        if (status.HasValue)
+        {
+            query = query.Where(t => t.Status == status.Value);
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        // Use long arithmetic to avoid overflow for large page numbers.
+        var offset = ((long)page - 1) * pageSize;
+
+        if (offset >= totalCount)
+        {
+            return new TemplatePageResult(
+                Array.Empty<TemplateSummaryResult>(),
+                page,
+                pageSize,
+                totalCount);
+        }
+
+        var rows = await query
+            .OrderBy(t => t.Name)
+            .ThenBy(t => t.Id)
+            .Skip((int)offset)
+            .Take(pageSize)
+            .Select(t => new
+            {
+                t.Id,
+                t.Name,
+                t.Status,
+                QuestionCount = t.Questions.Count()
+            })
+            .ToListAsync(cancellationToken);
+
+        var items = rows
+            .Select(t => new TemplateSummaryResult(
+                t.Id,
+                t.Name,
+                t.Status.ToString(),
+                t.QuestionCount))
+            .ToList();
+
+        return new TemplatePageResult(
+            items,
+            page,
+            pageSize,
+            totalCount);
+    }
 }

@@ -80,3 +80,25 @@ Content-Type: application/json
 
 ### Reject publishing a missing template
 POST {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000/publish
+
+### All templates, using default pagination
+GET {{baseUrl}}/api/inspection-templates
+
+### Published templates only
+GET {{baseUrl}}/api/inspection-templates?status=Published&page=1&pageSize=10
+
+### Draft templates, one per page
+GET {{baseUrl}}/api/inspection-templates?status=Draft&page=1&pageSize=1
+
+### Second page of drafts
+GET {{baseUrl}}/api/inspection-templates?status=Draft&page=2&pageSize=1
+
+### Invalid page
+GET {{baseUrl}}/api/inspection-templates?page=0
+
+### Excessive page size
+GET {{baseUrl}}/api/inspection-templates?pageSize=101
+
+### Invalid status
+GET {{baseUrl}}/api/inspection-templates?status=Unknown
+

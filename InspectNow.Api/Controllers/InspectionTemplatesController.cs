@@ -168,5 +168,24 @@ public sealed class InspectionTemplatesController : ControllerBase
                         "Unexpected publish outcome.");
             }
         }
-    
+    [HttpGet]
+    [ProducesResponseType(
+    typeof(TemplatePageResult),
+    StatusCodes.Status200OK)]
+    [ProducesResponseType(
+    typeof(ValidationProblemDetails),
+    StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<TemplatePageResult>> List(
+    [FromQuery] ListTemplatesRequest request,
+    [FromServices] ListInspectionTemplates useCase,
+    CancellationToken cancellationToken)
+    {
+        var result = await useCase.ExecuteAsync(
+            request.Status,
+            request.Page,
+            request.PageSize,
+            cancellationToken);
+
+        return Ok(result);
+    }
 }
