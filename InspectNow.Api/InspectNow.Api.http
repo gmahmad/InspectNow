@@ -36,7 +36,7 @@ POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/q
 Content-Type: application/json
 
 {
-  "text": "Are the floors clean?",
+  "text": "Are the floors clean???",
   "isRequired": true
 }
 
@@ -57,3 +57,26 @@ Content-Type: application/json
   "text": "Are the floors clean?",
   "isRequired": true
 }
+
+### Get the template with its questions
+GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+Accept: application/json
+
+### Publish our template
+POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/publish
+
+### Read the published template
+GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+Accept: application/json
+
+### Reject adding a question after publishing
+POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+Content-Type: application/json
+
+{
+  "text": "This question should not be saved.",
+  "isRequired": false
+}
+
+### Reject publishing a missing template
+POST {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000/publish

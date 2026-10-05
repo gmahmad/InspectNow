@@ -108,9 +108,65 @@ public sealed class InspectionTemplatesController : ControllerBase
                     statusCode: StatusCodes.Status409Conflict,
                     title: "Only draft templates can be modified.");
 
+            case AddTemplateQuestionOutcome.ConcurrencyConflict:
+                return Problem(
+                    statusCode: StatusCodes.Status409Conflict,
+                    title: "The template changed while you were editing it.",
+                    detail: "Reload the template and try again.");
+
             default:
                 throw new InvalidOperationException(
                     "Unexpected add-question outcome.");
         }
     }
+        [HttpPost("{id:guid}/publish")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status404NotFound)]
+        [ProducesResponseType(
+    typeof(ProblemDetails),
+    StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> Publish(
+    Guid id,
+    [FromServices] PublishInspectionTemplate useCase,
+    CancellationToken cancellationToken)
+        {
+            var outcome = await useCase.ExecuteAsync(
+                id,
+                cancellationToken);
+
+            switch (outcome)
+            {
+                case PublishTemplateOutcome.Published:
+                    return NoContent();
+
+                case PublishTemplateOutcome.TemplateNotFound:
+                    return Problem(
+                        statusCode: StatusCodes.Status404NotFound,
+                        title: "Inspection template not found.");
+
+                case PublishTemplateOutcome.TemplateNotDraft:
+                    return Problem(
+                        statusCode: StatusCodes.Status409Conflict,
+                        title: "Only draft templates can be published.");
+
+                case PublishTemplateOutcome.NoQuestions:
+                    return Problem(
+                        statusCode: StatusCodes.Status409Conflict,
+                        title: "The template has no questions.",
+                        detail: "Add at least one question before publishing.");
+
+                case PublishTemplateOutcome.ConcurrencyConflict:
+                    return Problem(
+                        statusCode: StatusCodes.Status409Conflict,
+                        title: "The template changed while publishing.",
+                        detail: "Reload the template and review it before trying again.");
+
+                default:
+                    throw new InvalidOperationException(
+                        "Unexpected publish outcome.");
+            }
+        }
+    
 }

@@ -3,4 +3,5 @@
 public sealed record TemplateDetailsResult(
     Guid Id,
     string Name,
-    string Status);
+    string Status,
+    IReadOnlyList<TemplateQuestionResult> Questions);

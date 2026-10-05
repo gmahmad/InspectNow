@@ -36,7 +36,14 @@ public sealed class InspectionTemplateRepository
             {
                 t.Id,
                 t.Name,
-                t.Status
+                t.Status,
+                Questions = t.Questions
+                    .OrderBy(q => q.Id)
+                    .Select(q => new TemplateQuestionResult(
+                        q.Id,
+                        q.Text,
+                        q.IsRequired))
+                    .ToList()
             })
             .SingleOrDefaultAsync(cancellationToken);
 
@@ -48,7 +55,8 @@ public sealed class InspectionTemplateRepository
         return new TemplateDetailsResult(
             template.Id,
             template.Name,
-            template.Status.ToString());
+            template.Status.ToString(),
+            template.Questions);
     }
 
     public async Task<InspectionTemplate?> GetForUpdateAsync(
@@ -60,5 +68,19 @@ public sealed class InspectionTemplateRepository
             .SingleOrDefaultAsync(
                 t => t.Id == id,
                 cancellationToken);
+    }
+
+    public async Task<bool> TrySaveChangesAsync(
+    CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return true;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return false;
+        }
     }
 }

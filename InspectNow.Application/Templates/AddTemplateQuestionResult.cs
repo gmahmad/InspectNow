@@ -4,9 +4,9 @@ public enum AddTemplateQuestionOutcome
 {
     Added,
     TemplateNotFound,
-    TemplateNotDraft
+    TemplateNotDraft,
+    ConcurrencyConflict
 }
-
 public sealed record AddTemplateQuestionResult(
     AddTemplateQuestionOutcome Outcome,
     Guid? QuestionId = null);

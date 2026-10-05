@@ -36,7 +36,13 @@ public sealed class AddTemplateQuestion
 
         var questionId = template.AddQuestion(text, isRequired);
 
-        await _repository.SaveChangesAsync(cancellationToken);
+        var saved = await _repository.TrySaveChangesAsync(cancellationToken);
+
+        if (!saved)
+        {
+            return new AddTemplateQuestionResult(
+                AddTemplateQuestionOutcome.ConcurrencyConflict);
+        }
 
         return new AddTemplateQuestionResult(
             AddTemplateQuestionOutcome.Added,

@@ -12,6 +12,9 @@ public sealed class InspectionTemplate
 
     public IReadOnlyList<TemplateQuestion> Questions =>
         _questions.AsReadOnly();
+
+    public Guid Version { get; private set; } = Guid.NewGuid();
+
     public InspectionTemplate(string name)
     {
         Name = ValidateName(name);
@@ -22,7 +25,9 @@ public sealed class InspectionTemplate
     public void Rename(string name)
     {
         EnsureDraft();
+
         Name = ValidateName(name);
+        Version = Guid.NewGuid();
     }
 
     public Guid AddQuestion(string text, bool isRequired)
@@ -30,7 +35,9 @@ public sealed class InspectionTemplate
         EnsureDraft();
 
         var question = new TemplateQuestion(text, isRequired);
+
         _questions.Add(question);
+        Version = Guid.NewGuid();
 
         return question.Id;
     }
@@ -46,6 +53,7 @@ public sealed class InspectionTemplate
         }
 
         Status = TemplateStatus.Published;
+        Version = Guid.NewGuid();
     }
 
     private void EnsureDraft()

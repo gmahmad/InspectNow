@@ -35,5 +35,9 @@ public sealed class InspectionTemplateConfiguration
         builder.Navigation(t => t.Questions)
             .HasField("_questions")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Property(t => t.Version)
+            .IsConcurrencyToken()
+            .ValueGeneratedNever();
     }
 }
