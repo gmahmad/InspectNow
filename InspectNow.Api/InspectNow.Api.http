@@ -102,3 +102,20 @@ GET {{baseUrl}}/api/inspection-templates?pageSize=101
 ### Invalid status
 GET {{baseUrl}}/api/inspection-templates?status=Unknown
 
+### Start an inspection from our published template
+POST {{baseUrl}}/api/inspections
+Content-Type: application/json
+
+{
+  "templateId": "163648a9-dfe5-4817-b275-964234c12040",
+  "siteName": "Lahore Office"
+}
+
+### Retrieve an inspection
+GET {{baseUrl}}/api/inspections/6e46b3ad-df92-4d82-94ee-75d97887140e
+Accept: application/json
+
+### Missing inspection
+GET {{baseUrl}}/api/inspections/00000000-0000-0000-0000-000000000000
+Accept: application/json
+

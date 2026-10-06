@@ -1,3 +1,4 @@
+using InspectNow.Application.Inspections;
 using InspectNow.Application.Templates;
 using InspectNow.Infrastructure.Persistence;
 using InspectNow.Infrastructure.Persistence.Repositories;
@@ -28,6 +29,10 @@ builder.Services.AddScoped<GetInspectionTemplate>();
 builder.Services.AddScoped<AddTemplateQuestion>();
 builder.Services.AddScoped<PublishInspectionTemplate>();
 builder.Services.AddScoped<ListInspectionTemplates>();
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddScoped<IInspectionRepository, InspectionRepository>();
+builder.Services.AddScoped<StartInspection>();
+builder.Services.AddScoped<GetInspection>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

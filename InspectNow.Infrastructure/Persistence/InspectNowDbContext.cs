@@ -1,4 +1,5 @@
-﻿using InspectNow.Domain.Templates;
+﻿using InspectNow.Domain.Inspections;
+using InspectNow.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
 
 namespace InspectNow.Infrastructure.Persistence;
@@ -13,7 +14,7 @@ public sealed class InspectNowDbContext : DbContext
 
     public DbSet<InspectionTemplate> InspectionTemplates =>
         Set<InspectionTemplate>();
-
+    public DbSet<Inspection> Inspections => Set<Inspection>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
