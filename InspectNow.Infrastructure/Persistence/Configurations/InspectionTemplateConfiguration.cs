@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,7 +15,7 @@ public sealed class InspectionTemplateConfiguration
         builder.HasKey(t => t.Id);
 
         builder.Property(t => t.Id)
-            .ValueGeneratedNever();
+            .UseIdentityByDefaultColumn();
 
         builder.Property(t => t.Name)
             .HasMaxLength(InspectionTemplate.MaxNameLength)

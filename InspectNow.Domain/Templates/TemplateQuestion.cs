@@ -1,10 +1,10 @@
-﻿namespace InspectNow.Domain.Templates;
+namespace InspectNow.Domain.Templates;
 
 public sealed class TemplateQuestion
 {
     public const int MaxTextLength = 500;
 
-    public Guid Id { get; private set; }
+    public long Id { get; private set; }
     public string Text { get; private set; }
     public bool IsRequired { get; private set; }
 
@@ -26,7 +26,6 @@ public sealed class TemplateQuestion
                 nameof(text));
         }
 
-        Id = Guid.NewGuid();
         Text = trimmedText;
         IsRequired = isRequired;
     }

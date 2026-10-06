@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 
 namespace InspectNow.Domain.Inspections;
 
@@ -8,8 +8,8 @@ public sealed class Inspection
 
     private readonly List<InspectionQuestion> _questions = new();
 
-    public Guid Id { get; private set; }
-    public Guid TemplateId { get; private set; }
+    public long Id { get; private set; }
+    public long TemplateId { get; private set; }
     public Guid TemplateVersion { get; private set; }
 
     public string TemplateName { get; private set; } = string.Empty;
@@ -62,9 +62,15 @@ public sealed class Inspection
                 nameof(siteName));
         }
 
+        // Snapshot source identifiers must already be database-generated.
+        if (template.Id <= 0 || template.Questions.Any(question => question.Id <= 0))
+        {
+            throw new InvalidOperationException(
+                "Save the template and its questions before starting an inspection.");
+        }
+
         var inspection = new Inspection
         {
-            Id = Guid.NewGuid(),
             TemplateId = template.Id,
             TemplateVersion = template.Version,
             TemplateName = template.Name,
@@ -92,14 +98,20 @@ public sealed class Inspection
     }
 
     public void AnswerQuestion(
-    Guid questionId,
-    InspectionAnswer answer,
-    string? comment)
+        long questionId,
+        InspectionAnswer answer,
+        string? comment)
     {
         if (Status != InspectionStatus.Draft)
         {
             throw new InvalidOperationException(
                 "Only draft inspections can be changed.");
+        }
+
+        if (questionId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(questionId), "A saved question ID is required.");
         }
 
         var question = _questions.SingleOrDefault(

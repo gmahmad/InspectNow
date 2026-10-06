@@ -1,6 +1,6 @@
-﻿namespace InspectNow.Application.Templates;
+namespace InspectNow.Application.Templates;
 
 public sealed record TemplateQuestionResult(
-    Guid Id,
+    long Id,
     string Text,
     bool IsRequired);

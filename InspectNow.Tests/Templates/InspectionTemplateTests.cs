@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 using Xunit;
 
 namespace InspectNow.Tests.Templates;
@@ -10,7 +10,7 @@ public class InspectionTemplateTests
     {
         var template = new InspectionTemplate("  Office Cleaning  ");
 
-        Assert.NotEqual(Guid.Empty, template.Id);
+        Assert.Equal(0L, template.Id); // Assigned by PostgreSQL on save.
         Assert.Equal("Office Cleaning", template.Name);
         Assert.Equal(TemplateStatus.Draft, template.Status);
     }
@@ -53,13 +53,14 @@ public class InspectionTemplateTests
     {
         var template = new InspectionTemplate("Office Cleaning");
 
-        Guid questionId = template.AddQuestion(
+        var addedQuestion = template.AddQuestion(
             "  Describe the floor condition.  ",
             isRequired: true);
 
         var question = Assert.Single(template.Questions);
 
-        Assert.Equal(questionId, question.Id);
+        Assert.Same(addedQuestion, question);
+        Assert.Equal(0L, question.Id);
         Assert.Equal("Describe the floor condition.", question.Text);
         Assert.True(question.IsRequired);
     }

@@ -1,8 +1,8 @@
-﻿namespace InspectNow.Application.Inspections;
+namespace InspectNow.Application.Inspections;
 
 public sealed record InspectionDetailsResult(
-    Guid Id,
-    Guid TemplateId,
+    long Id,
+    long TemplateId,
     string TemplateName,
     string SiteName,
     string Status,

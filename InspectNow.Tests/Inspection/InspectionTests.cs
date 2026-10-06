@@ -1,6 +1,7 @@
-﻿using InspectNow.Domain.Inspections;
+using InspectNow.Domain.Inspections;
 using InspectNow.Domain.Templates;
 using Xunit;
+using InspectNow.Tests.Support;
 
 namespace InspectNow.Tests.Inspections;
 
@@ -12,11 +13,13 @@ public sealed class InspectionTests
         var template = new InspectionTemplate(
             "Office Cleaning Inspection");
 
-        var sourceQuestionId = template.AddQuestion(
+        var sourceQuestion = template.AddQuestion(
             "Are the floors clean?",
             true);
 
         template.Publish();
+        PersistedEntityFixture.AssignId(template, 101);
+        PersistedEntityFixture.AssignId(Assert.Single(template.Questions), 201);
 
         var startedAt = new DateTimeOffset(
             2026, 10, 6, 10, 0, 0,
@@ -27,7 +30,7 @@ public sealed class InspectionTests
             "  Lahore Office  ",
             startedAt);
 
-        Assert.NotEqual(Guid.Empty, inspection.Id);
+        Assert.Equal(0L, inspection.Id);
         Assert.NotEqual(Guid.Empty, inspection.Version);
         Assert.Equal(template.Id, inspection.TemplateId);
         Assert.Equal(template.Version, inspection.TemplateVersion);
@@ -45,9 +48,9 @@ public sealed class InspectionTests
 
         var question = Assert.Single(inspection.Questions);
 
-        Assert.NotEqual(Guid.Empty, question.Id);
-        Assert.NotEqual(sourceQuestionId, question.Id);
-        Assert.Equal(sourceQuestionId, question.SourceQuestionId);
+        Assert.Equal(0L, question.Id);
+        Assert.NotSame(sourceQuestion, question);
+        Assert.Equal(sourceQuestion.Id, question.SourceQuestionId);
         Assert.Equal("Are the floors clean?", question.Text);
         Assert.True(question.IsRequired);
         Assert.Equal(1, question.Position);
@@ -112,16 +115,29 @@ public sealed class InspectionTests
             "Islamabad Office",
             startedAt);
 
-        Assert.NotEqual(first.Id, second.Id);
+        Assert.NotSame(first, second);
+        Assert.Equal(0L, first.Id);
+        Assert.Equal(0L, second.Id);
 
         var firstQuestion = Assert.Single(first.Questions);
         var secondQuestion = Assert.Single(second.Questions);
 
-        Assert.NotEqual(firstQuestion.Id, secondQuestion.Id);
+        Assert.NotSame(firstQuestion, secondQuestion);
 
         Assert.Equal(
             firstQuestion.SourceQuestionId,
             secondQuestion.SourceQuestionId);
+    }
+
+    [Fact]
+    public void Start_WithUnsavedPublishedTemplate_Throws()
+    {
+        var template = new InspectionTemplate("Unsaved template");
+        template.AddQuestion("Question", true);
+        template.Publish();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            Inspection.Start(template, "Office", DateTimeOffset.UtcNow));
     }
 
     private static InspectionTemplate CreatePublishedTemplate()
@@ -131,6 +147,8 @@ public sealed class InspectionTests
 
         template.AddQuestion("Are the floors clean?", true);
         template.Publish();
+        PersistedEntityFixture.AssignId(template, 101);
+        PersistedEntityFixture.AssignId(Assert.Single(template.Questions), 201);
 
         return template;
     }

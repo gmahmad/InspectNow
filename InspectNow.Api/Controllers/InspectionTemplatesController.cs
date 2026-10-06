@@ -1,4 +1,4 @@
-﻿using InspectNow.Api.Contracts.Templates;
+using InspectNow.Api.Contracts.Templates;
 using InspectNow.Application.Templates;
 using Microsoft.AspNetCore.Mvc;
 
@@ -40,7 +40,7 @@ public sealed class InspectionTemplatesController : ControllerBase
             result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:long:min(1)}")]
     [ProducesResponseType(
         typeof(TemplateDetailsResult),
         StatusCodes.Status200OK)]
@@ -48,7 +48,7 @@ public sealed class InspectionTemplatesController : ControllerBase
         typeof(ProblemDetails),
         StatusCodes.Status404NotFound)]
     public async Task<ActionResult<TemplateDetailsResult>> GetById(
-        Guid id,
+        long id,
         CancellationToken cancellationToken)
     {
         var result = await _getTemplate.ExecuteAsync(
@@ -65,7 +65,7 @@ public sealed class InspectionTemplatesController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost("{id:guid}/questions")]
+    [HttpPost("{id:long:min(1)}/questions")]
     [ProducesResponseType(
     typeof(AddTemplateQuestionResponse),
     StatusCodes.Status201Created)]
@@ -79,7 +79,7 @@ public sealed class InspectionTemplatesController : ControllerBase
     typeof(ProblemDetails),
     StatusCodes.Status409Conflict)]
     public async Task<ActionResult<AddTemplateQuestionResponse>> AddQuestion(
-        Guid id,
+        long id,
         [FromBody] AddTemplateQuestionRequest request,
         [FromServices] AddTemplateQuestion useCase,
         CancellationToken cancellationToken)
@@ -119,7 +119,7 @@ public sealed class InspectionTemplatesController : ControllerBase
                     "Unexpected add-question outcome.");
         }
     }
-        [HttpPost("{id:guid}/publish")]
+        [HttpPost("{id:long:min(1)}/publish")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(
     typeof(ProblemDetails),
@@ -128,7 +128,7 @@ public sealed class InspectionTemplatesController : ControllerBase
     typeof(ProblemDetails),
     StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Publish(
-    Guid id,
+    long id,
     [FromServices] PublishInspectionTemplate useCase,
     CancellationToken cancellationToken)
         {

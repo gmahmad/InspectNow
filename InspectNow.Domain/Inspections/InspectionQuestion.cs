@@ -1,9 +1,9 @@
-﻿namespace InspectNow.Domain.Inspections;
+namespace InspectNow.Domain.Inspections;
 
 public sealed class InspectionQuestion
 {
-    public Guid Id { get; private set; }
-    public Guid SourceQuestionId { get; private set; }
+    public long Id { get; private set; }
+    public long SourceQuestionId { get; private set; }
     public string Text { get; private set; } = string.Empty;
     public bool IsRequired { get; private set; }
     public int Position { get; private set; }
@@ -14,12 +14,12 @@ public sealed class InspectionQuestion
     }
 
     internal InspectionQuestion(
-        Guid sourceQuestionId,
+        long sourceQuestionId,
         string text,
         bool isRequired,
         int position)
     {
-        Id = Guid.NewGuid();
+
         SourceQuestionId = sourceQuestionId;
         Text = text;
         IsRequired = isRequired;

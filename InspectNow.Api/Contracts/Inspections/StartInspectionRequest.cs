@@ -1,11 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using InspectNow.Domain.Inspections;
 
 namespace InspectNow.Api.Contracts.Inspections;
 
 public sealed class StartInspectionRequest : IValidatableObject
 {
-    public Guid TemplateId { get; init; }
+    public long TemplateId { get; init; }
 
     [Required]
     [StringLength(Inspection.MaxSiteNameLength)]
@@ -14,7 +14,7 @@ public sealed class StartInspectionRequest : IValidatableObject
     public IEnumerable<ValidationResult> Validate(
         ValidationContext validationContext)
     {
-        if (TemplateId == Guid.Empty)
+        if (TemplateId <= 0)
         {
             yield return new ValidationResult(
                 "A template ID is required.",

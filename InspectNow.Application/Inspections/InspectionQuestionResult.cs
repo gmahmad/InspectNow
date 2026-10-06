@@ -1,8 +1,8 @@
-﻿namespace InspectNow.Application.Inspections;
+namespace InspectNow.Application.Inspections;
 
 public sealed record InspectionQuestionResult(
-    Guid Id,
-    Guid SourceQuestionId,
+    long Id,
+    long SourceQuestionId,
     string Text,
     bool IsRequired,
     int Position);

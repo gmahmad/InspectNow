@@ -1,4 +1,4 @@
-﻿using InspectNow.Application.Templates;
+using InspectNow.Application.Templates;
 using InspectNow.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +27,7 @@ public sealed class InspectionTemplateRepository
     }
 
     public async Task<TemplateDetailsResult?> GetDetailsAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default)
     {
         var template = await _dbContext.InspectionTemplates
@@ -60,7 +60,7 @@ public sealed class InspectionTemplateRepository
     }
 
     public async Task<InspectionTemplate?> GetForUpdateAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default)
     {
         return await _dbContext.InspectionTemplates

@@ -1,4 +1,4 @@
-﻿using InspectNow.Api.Contracts.Inspections;
+using InspectNow.Api.Contracts.Inspections;
 using InspectNow.Application.Inspections;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,7 +57,7 @@ public sealed class InspectionsController : ControllerBase
         }
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:long:min(1)}")]
     [ProducesResponseType(
     typeof(InspectionDetailsResult),
     StatusCodes.Status200OK)]
@@ -65,7 +65,7 @@ public sealed class InspectionsController : ControllerBase
     typeof(ProblemDetails),
     StatusCodes.Status404NotFound)]
     public async Task<ActionResult<InspectionDetailsResult>> GetById(
-    Guid id,
+    long id,
     [FromServices] GetInspection useCase,
     CancellationToken cancellationToken)
     {

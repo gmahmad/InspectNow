@@ -1,5 +1,5 @@
-﻿namespace InspectNow.Application.Templates;
+namespace InspectNow.Application.Templates;
 
 public sealed record CreateTemplateResult(
-    Guid Id,
+    long Id,
     string Name);

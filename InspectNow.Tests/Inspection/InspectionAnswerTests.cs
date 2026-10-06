@@ -1,6 +1,7 @@
-﻿using InspectNow.Domain.Inspections;
+using InspectNow.Domain.Inspections;
 using InspectNow.Domain.Templates;
 using Xunit;
+using InspectNow.Tests.Support;
 
 namespace InspectNow.Tests.Inspections;
 
@@ -70,7 +71,7 @@ public class InspectionAnswerTests
     public void AnswerQuestion_FromAnotherInspection_Throws()
     {
         var inspection = CreateInspection();
-        var otherInspection = CreateInspection();
+        var otherInspection = CreateInspection(questionId: 302);
         var otherQuestion = Assert.Single(otherInspection.Questions);
 
         Assert.Throws<ArgumentException>(() =>
@@ -140,8 +141,19 @@ public class InspectionAnswerTests
         Assert.Single(inspection.Questions);
     }
 
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void AnswerQuestion_NonPositiveId_Throws(long questionId)
+    {
+        var inspection = CreateInspection();
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            inspection.AnswerQuestion(questionId, InspectionAnswer.Pass, null));
+    }
+
     private static Inspection CreateInspection(
-        bool isRequired = true)
+        bool isRequired = true,
+        long questionId = 301)
     {
         var template = new InspectionTemplate(
             "Office Cleaning Inspection");
@@ -151,12 +163,18 @@ public class InspectionAnswerTests
             isRequired);
 
         template.Publish();
+        PersistedEntityFixture.AssignId(template, 101);
+        PersistedEntityFixture.AssignId(Assert.Single(template.Questions), 201);
 
-        return Inspection.Start(
+        var inspection = Inspection.Start(
             template,
             "Lahore Office",
             new DateTimeOffset(
                 2026, 10, 6, 7, 0, 0,
                 TimeSpan.Zero));
+
+        PersistedEntityFixture.AssignId(inspection, 401);
+        PersistedEntityFixture.AssignId(Assert.Single(inspection.Questions), questionId);
+        return inspection;
     }
 }

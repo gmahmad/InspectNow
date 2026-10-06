@@ -1,4 +1,4 @@
-﻿namespace InspectNow.Application.Inspections;
+namespace InspectNow.Application.Inspections;
 
 public enum StartInspectionOutcome
 {
@@ -9,4 +9,4 @@ public enum StartInspectionOutcome
 
 public sealed record StartInspectionResult(
     StartInspectionOutcome Outcome,
-    Guid? InspectionId = null);
+    long? InspectionId = null);

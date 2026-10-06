@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Inspections;
+using InspectNow.Domain.Inspections;
 using InspectNow.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -13,7 +13,7 @@ public sealed class InspectionConfiguration
         builder.ToTable("Inspections");
 
         builder.HasKey(i => i.Id);
-        builder.Property(i => i.Id).ValueGeneratedNever();
+        builder.Property(i => i.Id).UseIdentityByDefaultColumn();
 
         builder.Property(i => i.SiteName)
             .HasMaxLength(Inspection.MaxSiteNameLength)

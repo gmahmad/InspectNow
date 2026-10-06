@@ -1,10 +1,10 @@
-﻿namespace InspectNow.Domain.Templates;
+namespace InspectNow.Domain.Templates;
 
 public sealed class InspectionTemplate
 {
     public const int MaxNameLength = 200;
 
-    public Guid Id { get; private set; }
+    public long Id { get; private set; }
     public string Name { get; private set; }
     public TemplateStatus Status { get; private set; }
 
@@ -18,7 +18,7 @@ public sealed class InspectionTemplate
     public InspectionTemplate(string name)
     {
         Name = ValidateName(name);
-        Id = Guid.NewGuid();
+
         Status = TemplateStatus.Draft;
     }
 
@@ -30,7 +30,7 @@ public sealed class InspectionTemplate
         Version = Guid.NewGuid();
     }
 
-    public Guid AddQuestion(string text, bool isRequired)
+    public TemplateQuestion AddQuestion(string text, bool isRequired)
     {
         EnsureDraft();
 
@@ -39,7 +39,7 @@ public sealed class InspectionTemplate
         _questions.Add(question);
         Version = Guid.NewGuid();
 
-        return question.Id;
+        return question;
     }
 
     public void Publish()

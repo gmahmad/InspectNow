@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 
 namespace InspectNow.Application.Templates;
 
@@ -13,7 +13,7 @@ public sealed class PublishInspectionTemplate
     }
 
     public async Task<PublishTemplateOutcome> ExecuteAsync(
-        Guid templateId,
+        long templateId,
         CancellationToken cancellationToken = default)
     {
         var template = await _repository.GetForUpdateAsync(

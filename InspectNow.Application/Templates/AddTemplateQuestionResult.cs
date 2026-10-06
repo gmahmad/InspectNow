@@ -1,4 +1,4 @@
-﻿namespace InspectNow.Application.Templates;
+namespace InspectNow.Application.Templates;
 
 public enum AddTemplateQuestionOutcome
 {
@@ -9,4 +9,4 @@ public enum AddTemplateQuestionOutcome
 }
 public sealed record AddTemplateQuestionResult(
     AddTemplateQuestionOutcome Outcome,
-    Guid? QuestionId = null);
+    long? QuestionId = null);

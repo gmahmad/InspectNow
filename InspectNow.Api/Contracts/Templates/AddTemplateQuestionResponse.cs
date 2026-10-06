@@ -1,3 +1,3 @@
-﻿namespace InspectNow.Api.Contracts.Templates;
+namespace InspectNow.Api.Contracts.Templates;
 
-public sealed record AddTemplateQuestionResponse(Guid QuestionId);
+public sealed record AddTemplateQuestionResponse(long QuestionId);

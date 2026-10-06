@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Inspections;
+using InspectNow.Domain.Inspections;
 
 namespace InspectNow.Application.Inspections;
 
@@ -10,6 +10,6 @@ public interface IInspectionRepository
         CancellationToken cancellationToken = default);
 
     Task<InspectionDetailsResult?> GetDetailsAsync(
-    Guid id,
+    long id,
     CancellationToken cancellationToken = default);
 }

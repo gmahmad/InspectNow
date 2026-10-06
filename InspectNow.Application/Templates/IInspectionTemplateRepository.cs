@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 
 namespace InspectNow.Application.Templates;
 
@@ -10,11 +10,11 @@ public interface IInspectionTemplateRepository
         CancellationToken cancellationToken = default);
 
     Task<TemplateDetailsResult?> GetDetailsAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default);
 
     Task<InspectionTemplate?> GetForUpdateAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default);
 
     Task<bool> TrySaveChangesAsync(

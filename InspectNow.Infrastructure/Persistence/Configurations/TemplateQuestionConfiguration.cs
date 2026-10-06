@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,7 +15,7 @@ public sealed class TemplateQuestionConfiguration
         builder.HasKey(q => q.Id);
 
         builder.Property(q => q.Id)
-            .ValueGeneratedNever();
+            .UseIdentityByDefaultColumn();
 
         builder.Property(q => q.Text)
             .HasMaxLength(TemplateQuestion.MaxTextLength)

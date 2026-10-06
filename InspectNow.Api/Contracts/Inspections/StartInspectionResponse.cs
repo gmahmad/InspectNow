@@ -1,3 +1,3 @@
-﻿namespace InspectNow.Api.Contracts.Inspections;
+namespace InspectNow.Api.Contracts.Inspections;
 
-public sealed record StartInspectionResponse(Guid Id);
+public sealed record StartInspectionResponse(long Id);

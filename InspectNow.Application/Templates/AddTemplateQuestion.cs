@@ -1,4 +1,4 @@
-﻿using InspectNow.Domain.Templates;
+using InspectNow.Domain.Templates;
 
 namespace InspectNow.Application.Templates;
 
@@ -13,7 +13,7 @@ public sealed class AddTemplateQuestion
     }
 
     public async Task<AddTemplateQuestionResult> ExecuteAsync(
-        Guid templateId,
+        long templateId,
         string text,
         bool isRequired,
         CancellationToken cancellationToken = default)
@@ -34,7 +34,7 @@ public sealed class AddTemplateQuestion
                 AddTemplateQuestionOutcome.TemplateNotDraft);
         }
 
-        var questionId = template.AddQuestion(text, isRequired);
+        var question = template.AddQuestion(text, isRequired);
 
         var saved = await _repository.TrySaveChangesAsync(cancellationToken);
 
@@ -46,6 +46,6 @@ public sealed class AddTemplateQuestion
 
         return new AddTemplateQuestionResult(
             AddTemplateQuestionOutcome.Added,
-            questionId);
+            question.Id);
     }
 }

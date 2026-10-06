@@ -1,4 +1,4 @@
-﻿namespace InspectNow.Application.Inspections;
+namespace InspectNow.Application.Inspections;
 
 public sealed class GetInspection
 {
@@ -10,7 +10,7 @@ public sealed class GetInspection
     }
 
     public Task<InspectionDetailsResult?> ExecuteAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDetailsAsync(id, cancellationToken);

@@ -1,7 +1,7 @@
-﻿namespace InspectNow.Application.Templates;
+namespace InspectNow.Application.Templates;
 
 public sealed record TemplateSummaryResult(
-    Guid Id,
+    long Id,
     string Name,
     string Status,
     int QuestionCount);

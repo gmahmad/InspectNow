@@ -1,4 +1,4 @@
-﻿namespace InspectNow.Application.Templates;
+namespace InspectNow.Application.Templates;
 
 public sealed class GetInspectionTemplate
 {
@@ -11,7 +11,7 @@ public sealed class GetInspectionTemplate
     }
 
     public Task<TemplateDetailsResult?> ExecuteAsync(
-        Guid id,
+        long id,
         CancellationToken cancellationToken = default)
     {
         return _repository.GetDetailsAsync(id, cancellationToken);

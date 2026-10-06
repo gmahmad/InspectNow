@@ -6,6 +6,9 @@ Accept: application/json
 ###
 
 @baseUrl = https://localhost:7145
+# Replace these with numeric IDs returned by your API.
+@templateId = 1
+@inspectionId = 1
 
 ### Create a draft inspection template
 POST {{baseUrl}}/api/inspection-templates
@@ -24,15 +27,15 @@ Content-Type: application/json
 }
 
 ### Retrieve the template already created
-GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+GET {{baseUrl}}/api/inspection-templates/{{templateId}}
 Accept: application/json
 
 ### Request a nonexistent template
-GET {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/api/inspection-templates/9223372036854775807
 Accept: application/json
 
 ### Add a question to our existing draft
-POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
 Content-Type: application/json
 
 {
@@ -41,7 +44,7 @@ Content-Type: application/json
 }
 
 ### Reject blank question text
-POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
 Content-Type: application/json
 
 {
@@ -50,7 +53,7 @@ Content-Type: application/json
 }
 
 ### Handle a missing template
-POST {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000/questions
+POST {{baseUrl}}/api/inspection-templates/9223372036854775807/questions
 Content-Type: application/json
 
 {
@@ -59,18 +62,18 @@ Content-Type: application/json
 }
 
 ### Get the template with its questions
-GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+GET {{baseUrl}}/api/inspection-templates/{{templateId}}
 Accept: application/json
 
 ### Publish our template
-POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/publish
+POST {{baseUrl}}/api/inspection-templates/{{templateId}}/publish
 
 ### Read the published template
-GET {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040
+GET {{baseUrl}}/api/inspection-templates/{{templateId}}
 Accept: application/json
 
 ### Reject adding a question after publishing
-POST {{baseUrl}}/api/inspection-templates/163648a9-dfe5-4817-b275-964234c12040/questions
+POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
 Content-Type: application/json
 
 {
@@ -79,7 +82,7 @@ Content-Type: application/json
 }
 
 ### Reject publishing a missing template
-POST {{baseUrl}}/api/inspection-templates/00000000-0000-0000-0000-000000000000/publish
+POST {{baseUrl}}/api/inspection-templates/9223372036854775807/publish
 
 ### All templates, using default pagination
 GET {{baseUrl}}/api/inspection-templates
@@ -107,15 +110,15 @@ POST {{baseUrl}}/api/inspections
 Content-Type: application/json
 
 {
-  "templateId": "163648a9-dfe5-4817-b275-964234c12040",
+  "templateId": {{templateId}},
   "siteName": "Lahore Office"
 }
 
 ### Retrieve an inspection
-GET {{baseUrl}}/api/inspections/6e46b3ad-df92-4d82-94ee-75d97887140e
+GET {{baseUrl}}/api/inspections/{{inspectionId}}
 Accept: application/json
 
 ### Missing inspection
-GET {{baseUrl}}/api/inspections/00000000-0000-0000-0000-000000000000
+GET {{baseUrl}}/api/inspections/9223372036854775807
 Accept: application/json
 

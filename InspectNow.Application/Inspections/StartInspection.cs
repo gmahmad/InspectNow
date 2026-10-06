@@ -1,4 +1,4 @@
-﻿using InspectNow.Application.Templates;
+using InspectNow.Application.Templates;
 using InspectNow.Domain.Inspections;
 using InspectNow.Domain.Templates;
 
@@ -21,7 +21,7 @@ public sealed class StartInspection
     }
 
     public async Task<StartInspectionResult> ExecuteAsync(
-        Guid templateId,
+        long templateId,
         string siteName,
         CancellationToken cancellationToken = default)
     {

@@ -1,4 +1,4 @@
-﻿using InspectNow.Application.Inspections;
+using InspectNow.Application.Inspections;
 using InspectNow.Domain.Inspections;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +25,7 @@ public sealed class InspectionRepository : IInspectionRepository
     }
 
     public async Task<InspectionDetailsResult?> GetDetailsAsync(
-    Guid id,
+    long id,
     CancellationToken cancellationToken = default)
     {
         var inspection = await _dbContext.Inspections
