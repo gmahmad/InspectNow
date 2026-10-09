@@ -8,6 +8,17 @@ namespace InspectNow.Api.Controllers;
 [Route("api/inspections")]
 public sealed class InspectionsController : ControllerBase
 {
+    [HttpGet]
+    [ProducesResponseType(typeof(InspectionPageResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<InspectionPageResult>> List(
+        [FromQuery] ListInspectionsRequest request,
+        [FromServices] ListInspections useCase,
+        CancellationToken cancellationToken)
+    {
+        return Ok(await useCase.ExecuteAsync(request.ToQuery(), cancellationToken));
+    }
+
     [HttpPost]
     [ProducesResponseType(
         typeof(StartInspectionResponse),

@@ -1,4 +1,4 @@
-﻿using InspectNow.Infrastructure.Persistence;
+using InspectNow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -20,7 +20,8 @@ public sealed class InspectNowApiFactory
         builder.UseEnvironment("Development");
 
         var configuration = new ConfigurationBuilder()
-            .AddUserSecrets<Program>(optional: false)
+            .AddUserSecrets<Program>(optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
         var connectionString =

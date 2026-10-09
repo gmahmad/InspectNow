@@ -1,0 +1,27 @@
+@host = https://localhost:7145
+
+### Newest inspections first (default page 1, size 10)
+GET {{host}}/api/inspections
+Accept: application/json
+
+### Combine filters; replace templateId with a real id
+GET {{host}}/api/inspections?status=Draft&templateId=1&siteName=office&page=1&pageSize=10
+Accept: application/json
+
+### UTC range: inclusive start, exclusive end
+GET {{host}}/api/inspections?startedFromUtc=2026-10-01T00:00:00Z&startedToUtc=2026-11-01T00:00:00Z
+Accept: application/json
+
+### Expected 400 with errors, traceId and instance
+GET {{host}}/api/inspections?pageSize=101
+Accept: application/json
+
+### Expected 404 with traceId and instance
+GET {{host}}/api/does-not-exist
+Accept: application/json
+
+### Expected 200 Healthy (process is running)
+GET {{host}}/health/live
+
+### Expected 200 Healthy when PostgreSQL is reachable, otherwise 503 Unhealthy
+GET {{host}}/health/ready
