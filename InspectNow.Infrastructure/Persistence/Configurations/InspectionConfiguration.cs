@@ -31,6 +31,9 @@ public sealed class InspectionConfiguration
         builder.Property(i => i.StartedAtUtc)
             .HasColumnType("timestamp with time zone");
 
+        builder.Property(i => i.SubmittedAtUtc)
+            .HasColumnType("timestamp with time zone");
+
         builder.Property(i => i.Version)
             .IsConcurrencyToken()
             .ValueGeneratedNever();

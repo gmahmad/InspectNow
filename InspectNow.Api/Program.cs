@@ -33,6 +33,8 @@ builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddScoped<IInspectionRepository, InspectionRepository>();
 builder.Services.AddScoped<StartInspection>();
 builder.Services.AddScoped<GetInspection>();
+builder.Services.AddScoped<SaveInspectionAnswer>();
+builder.Services.AddScoped<SubmitInspection>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

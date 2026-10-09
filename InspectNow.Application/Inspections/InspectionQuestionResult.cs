@@ -5,4 +5,6 @@ public sealed record InspectionQuestionResult(
     long SourceQuestionId,
     string Text,
     bool IsRequired,
-    int Position);
+    int Position,
+    string? Answer,
+    string? Comment);

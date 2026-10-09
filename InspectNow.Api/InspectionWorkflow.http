@@ -1,0 +1,81 @@
+@baseUrl = https://localhost:7145
+# Replace with IDs returned by YOUR API. questionId is an inspection snapshot ID.
+@templateId = 1
+@inspectionId = 1
+@questionId = 1
+# Copy version from GET inspection; replace after EVERY successful write.
+@expectedVersion = 00000000-0000-0000-0000-000000000000
+# Retain an earlier version here to verify a stale edit returns 409.
+@staleVersion = 00000000-0000-0000-0000-000000000000
+
+### 1. Start an inspection from an existing published template (201)
+POST {{baseUrl}}/api/inspections
+Content-Type: application/json
+
+{
+  "templateId": {{templateId}},
+  "siteName": "Lahore Office"
+}
+
+### 2. Read questions + current version (200). Update variables above.
+GET {{baseUrl}}/api/inspections/{{inspectionId}}
+Accept: application/json
+
+### 3. Save an answer (200). Replace expectedVersion with returned version.
+PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Content-Type: application/json
+
+{
+  "answer": "Pass",
+  "comment": "Floors checked and clean.",
+  "expectedVersion": "{{expectedVersion}}"
+}
+
+### 4. Simulate a stale screen (409): staleVersion must be an OLD nonempty version.
+PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Content-Type: application/json
+
+{
+  "answer": "Fail",
+  "comment": "This stale write should not be saved.",
+  "expectedVersion": "{{staleVersion}}"
+}
+
+### 5. Submit (200 after all required questions are answered; otherwise 409).
+# Use latest expectedVersion. Fail is a completed answer, not a submission blocker.
+POST {{baseUrl}}/api/inspections/{{inspectionId}}/submit
+Content-Type: application/json
+
+{
+  "expectedVersion": "{{expectedVersion}}"
+}
+
+### 6. Verify Submitted status, UTC timestamp, answers and new version (200)
+GET {{baseUrl}}/api/inspections/{{inspectionId}}
+Accept: application/json
+
+### 7. Try editing a submitted inspection (409)
+PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Content-Type: application/json
+
+{
+  "answer": "Fail",
+  "expectedVersion": "{{expectedVersion}}"
+}
+
+### Missing version (400)
+PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Content-Type: application/json
+
+{
+  "answer": "Pass"
+}
+
+### Unknown answer (400)
+PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Content-Type: application/json
+
+{
+  "answer": "Unknown",
+  "expectedVersion": "{{expectedVersion}}"
+}

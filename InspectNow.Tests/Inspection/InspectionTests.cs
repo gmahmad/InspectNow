@@ -152,4 +152,14 @@ public sealed class InspectionTests
 
         return template;
     }
+
+    [Fact]
+    public void Start_NormalizesSubMicrosecondPrecision()
+    {
+        var template = CreatePublishedTemplate();
+        var startedAt = new DateTimeOffset(2026, 10, 9, 16, 40, 22,
+            TimeSpan.FromHours(5)).AddTicks(8_474_303);
+        var inspection = Inspection.Start(template, "Office", startedAt);
+        Assert.Equal(startedAt.ToUniversalTime().AddTicks(-3), inspection.StartedAtUtc);
+    }
 }

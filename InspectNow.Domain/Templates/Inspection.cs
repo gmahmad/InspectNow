@@ -17,6 +17,7 @@ public sealed class Inspection
 
     public InspectionStatus Status { get; private set; }
     public DateTimeOffset StartedAtUtc { get; private set; }
+    public DateTimeOffset? SubmittedAtUtc { get; private set; }
     public Guid Version { get; private set; }
 
     public IReadOnlyList<InspectionQuestion> Questions =>
@@ -76,7 +77,7 @@ public sealed class Inspection
             TemplateName = template.Name,
             SiteName = trimmedSiteName,
             Status = InspectionStatus.Draft,
-            StartedAtUtc = startedAt.ToUniversalTime(),
+            StartedAtUtc = ToUtcMicrosecondPrecision(startedAt),
             Version = Guid.NewGuid()
         };
 
@@ -127,5 +128,33 @@ public sealed class Inspection
         question.RecordAnswer(answer, comment);
 
         Version = Guid.NewGuid();
+    }
+
+    public void Submit(DateTimeOffset submittedAt)
+    {
+        if (Status != InspectionStatus.Draft)
+        {
+            throw new InvalidOperationException("Only draft inspections can be submitted.");
+        }
+
+        if (_questions.Any(question => question.IsRequired &&
+            question.Answer is not (InspectionAnswer.Pass or InspectionAnswer.Fail)))
+        {
+            throw new InvalidOperationException(
+                "Answer every required question with Pass or Fail before submitting.");
+        }
+
+        SubmittedAtUtc = ToUtcMicrosecondPrecision(submittedAt);
+        Status = InspectionStatus.Submitted;
+        Version = Guid.NewGuid();
+    }
+
+    // Our persisted/API timestamps use UTC with microsecond precision.
+    // .NET ticks are 100ns; PostgreSQL timestamp resolution is one microsecond.
+    private static DateTimeOffset ToUtcMicrosecondPrecision(DateTimeOffset value)
+    {
+        var utc = value.ToUniversalTime();
+        var ticks = utc.Ticks - (utc.Ticks % TimeSpan.TicksPerMicrosecond);
+        return new DateTimeOffset(ticks, TimeSpan.Zero);
     }
 }

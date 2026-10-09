@@ -13,6 +13,7 @@ using Xunit;
 
 namespace InspectNow.Tests.Integration;
 
+[Collection("PostgreSQL integration")]
 public sealed class TemplateLifecycleTests
 {
     [Fact]

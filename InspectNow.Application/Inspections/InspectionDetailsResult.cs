@@ -7,5 +7,6 @@ public sealed record InspectionDetailsResult(
     string SiteName,
     string Status,
     DateTimeOffset StartedAtUtc,
+    DateTimeOffset? SubmittedAtUtc,
     Guid Version,
     IReadOnlyList<InspectionQuestionResult> Questions);
