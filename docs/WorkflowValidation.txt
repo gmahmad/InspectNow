@@ -1,0 +1,8 @@
+All previously shipped migration and designer files are byte-identical.
+Project references resolve; dependency versions and project configuration unchanged.
+Entity ID signatures and C# delimiter checks passed (not a compilation check).
+New target model matches snapshot; only model change is nullable SubmittedAtUtc.
+Excluded folders and secrets.json absent.
+10 changed and 17 new files before generated reports.
+
+NOT EXECUTED: .NET build, xUnit tests, PostgreSQL migrations. SDK/database unavailable.

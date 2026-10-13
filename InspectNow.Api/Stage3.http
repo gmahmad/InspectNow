@@ -1,0 +1,27 @@
+@host = http://localhost:18080
+@templateId = 1
+
+### API process
+GET {{host}}/health/live
+
+### Container database connectivity
+GET {{host}}/health/ready
+
+### Verify migrations by creating a record (expect 201)
+POST {{host}}/api/inspection-templates
+Content-Type: application/json
+
+{
+  "name": "Docker Learning Inspection"
+}
+
+### Replace templateId above with the returned id; expect 200
+GET {{host}}/api/inspection-templates/{{templateId}}
+Accept: application/json
+
+### Existing inspection listing in the container database
+GET {{host}}/api/inspections?page=1&pageSize=10
+Accept: application/json
+
+### OpenAPI document in the local Development container
+GET {{host}}/openapi/v1.json

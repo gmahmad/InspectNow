@@ -1,0 +1,27 @@
+Stage 2 validation — 9 October 2026
+
+Executed here:
+- .NET SDK 10.0.300, Release build: PASS, 0 warnings, 0 errors.
+- xUnit via dotnet test: PASS, 56 passed, 0 failed, 0 skipped in the selected set.
+- Selected set includes domain, application and the new database-independent API pipeline tests.
+- The new pipeline checks cover safe 500 responses, unsupported Accept fallback,
+  validation, unknown routes, trace header/body correlation, liveness and unavailable readiness.
+- The earlier microsecond precision regression tests are included and passed.
+
+Not executed here:
+- Four tests requiring a running PostgreSQL instance: two TemplateLifecycleTests,
+  one InspectionWorkflowTests, one InspectionListingTests.
+- GitHub-hosted CI. The workflow is supplied, but has not been pushed or run from here.
+
+The local test command excluded only those three PostgreSQL test classes.
+Run ALL tests in Visual Studio with your inspectnow_tests connection configured.
+The complete expected suite is 60 cases. Do not interpret the selected run as a full database test pass.
+
+Static checks:
+- All existing domain, EF mapping, migration and model snapshot files are byte-for-byte unchanged.
+- Project XML, JSON configuration and workflow YAML parsed successfully.
+- No existing source file was removed; no new NuGet dependency was introduced.
+- Word guide rendered and both pages inspected.
+- ZIP excludes .git, .vs, bin, obj, TestResults and secrets.json.
+
+No data was read from or written to your local database during package creation.

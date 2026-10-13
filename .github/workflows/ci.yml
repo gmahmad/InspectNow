@@ -52,3 +52,45 @@ jobs:
           path: TestResults/**/*.trx
           if-no-files-found: warn
           retention-days: 7
+
+  container-smoke-test:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Create temporary container passwords
+        run: |
+          mkdir -p docker/secrets
+          openssl rand -hex 24 > docker/secrets/postgres-admin-password.txt
+          openssl rand -hex 24 > docker/secrets/app-db-password.txt
+      - name: Validate Compose and start the stack
+        run: |
+          docker compose -p inspectnow-ci config --quiet
+          docker compose -p inspectnow-ci up --build -d
+      - name: Check health and create a record
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2 --max-time 10 http://localhost:18080/health/ready
+          curl --fail --silent --show-error http://localhost:18080/health/live
+          curl --fail --silent --show-error -X POST http://localhost:18080/api/inspection-templates -H 'Content-Type: application/json' -d '{"name":"CI container inspection"}' -o /tmp/inspectnow-created.json
+          python3 -c 'import json; d=json.load(open("/tmp/inspectnow-created.json")); assert d["id"] > 0'
+      - name: Verify data survives container recreation
+        shell: bash
+        run: |
+          # This removes only this job's containers/network, keeping its named volume.
+          docker compose -p inspectnow-ci down
+          docker compose -p inspectnow-ci up -d
+          curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2 --max-time 10 http://localhost:18080/health/ready
+          template_id=$(python3 -c 'import json; print(json.load(open("/tmp/inspectnow-created.json"))["id"])')
+          curl --fail --silent --show-error "http://localhost:18080/api/inspection-templates/$template_id" -o /tmp/inspectnow-loaded.json
+          python3 -c 'import json; a=json.load(open("/tmp/inspectnow-created.json")); b=json.load(open("/tmp/inspectnow-loaded.json")); assert b["id"] == a["id"] and b["name"] == a["name"]'
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose -p inspectnow-ci logs --no-color
+      - name: Remove the disposable CI stack
+        if: always()
+        # Only the runner's inspectnow-ci volume is removed, never your local stack.
+        run: docker compose -p inspectnow-ci down --volumes

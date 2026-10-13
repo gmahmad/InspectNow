@@ -1,3 +1,4 @@
+using InspectNow.Api.Configuration;
 using InspectNow.Api.Diagnostics;
 using InspectNow.Api.Health;
 using InspectNow.Infrastructure.Persistence.Queries;
@@ -8,16 +9,11 @@ using InspectNow.Infrastructure.Persistence;
 using InspectNow.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
-
-var connectionString =
-    builder.Configuration.GetConnectionString("InspectNow");
-
-if (string.IsNullOrWhiteSpace(connectionString))
-{
-    throw new InvalidOperationException(
-        "Connection string 'InspectNow' is missing.");
-}
+// --migrate runs an explicit one-shot database job without starting HTTP.
+var migrateOnly = args.Contains("--migrate", StringComparer.Ordinal);
+var hostArgs = args.Where(arg => arg != "--migrate").ToArray();
+var builder = WebApplication.CreateBuilder(hostArgs);
+var connectionString = DatabaseConnectionString.Resolve(builder.Configuration);
 
 // Add services to the container.
 
@@ -57,7 +53,17 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+await using var app = builder.Build();
+
+if (migrateOnly)
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+    app.Logger.LogInformation("Applying pending InspectNow database migrations.");
+    await db.Database.MigrateAsync();
+    app.Logger.LogInformation("InspectNow database migrations completed.");
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -71,7 +77,9 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 // .NET 10 suppresses duplicate diagnostics for exceptions handled by our handler.
 app.UseExceptionHandler();
 app.UseStatusCodePages();
-app.UseHttpsRedirection();
+// Local Compose uses HTTP on loopback; Visual Studio keeps HTTPS redirection.
+if (app.Configuration.GetValue("Http:UseHttpsRedirection", true))
+    app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

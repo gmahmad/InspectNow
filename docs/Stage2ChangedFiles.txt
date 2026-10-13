@@ -1,0 +1,27 @@
+Changes relative to the timestamp-fix package
+
+NEW .github/workflows/ci.yml
+NEW InspectNow.Api/Contracts/Inspections/ListInspectionsRequest.cs
+UPDATED InspectNow.Api/Controllers/InspectionsController.cs
+NEW InspectNow.Api/Diagnostics/ApiProblemDetails.cs
+NEW InspectNow.Api/Diagnostics/GlobalExceptionHandler.cs
+NEW InspectNow.Api/Diagnostics/RequestLoggingMiddleware.cs
+NEW InspectNow.Api/Health/DatabaseHealthCheck.cs
+UPDATED InspectNow.Api/Program.cs
+NEW InspectNow.Api/Stage2.http
+NEW InspectNow.Application/Inspections/IInspectionQueries.cs
+NEW InspectNow.Application/Inspections/InspectionListQuery.cs
+NEW InspectNow.Application/Inspections/InspectionPageResult.cs
+NEW InspectNow.Application/Inspections/InspectionSummaryResult.cs
+NEW InspectNow.Application/Inspections/ListInspections.cs
+NEW InspectNow.Infrastructure/Persistence/Queries/InspectionQueries.cs
+NEW InspectNow.Tests/Integration/ApiFoundationTests.cs
+UPDATED InspectNow.Tests/Integration/InspectNowApiFactory.cs
+NEW InspectNow.Tests/Integration/InspectionListingTests.cs
+NEW README.md
+NEW STAGE2_UPDATE.md
+NEW docs/PROJECT_GUIDE.docx
+NEW docs/PROJECT_GUIDE.md
+NEW global.json
+
+No files need to be deleted. Migration, snapshot and mapping files are unchanged.

@@ -1,0 +1,28 @@
+Stage 3 validation — 9 October 2026
+
+Executed:
+- Release solution build with .NET SDK 10.0.300: PASS, 0 warnings and 0 errors.
+- API Release publish, UseAppHost=false: PASS.
+- Selected xUnit suite via dotnet test: PASS, 60 passed, 0 failed, 0 skipped.
+  Includes all 56 previously selected cases plus 4 connection-string/secret-file cases.
+- Docker Compose v5.6.0 config --quiet against compose.yaml: PASS.
+- Bash syntax checks for init-db.sh and container CI run steps: PASS.
+- YAML structure, service dependencies, volume path and loopback port checks: PASS.
+- Existing Domain, Application and Infrastructure source files remain byte-for-byte identical,
+  including all migrations, model snapshot and entity configurations.
+- No source files removed and no new NuGet dependencies added.
+- Learning Word guide rendered and all 3 pages inspected.
+
+Not executed here:
+- The 4 real PostgreSQL integration cases (the full suite now has 64 cases).
+- Docker image build, container startup/migration/persistence exercise, and GitHub CI:
+  there is no Docker Engine in this environment. Compose validation does not prove runtime behavior.
+
+Run the complete tests against your inspectnow_tests database, then follow Stage3.http
+and the persistence exercise in STAGE3_UPDATE.md. CI also exercises the full container stack.
+
+Data safety:
+- No access to your Windows repository or database occurred.
+- Container storage is a separate inspectnow-local named volume.
+- No local passwords, secrets.json, .git, .vs, bin or obj are shipped.
+- No new schema migration is needed for Stage 3.

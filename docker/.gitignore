@@ -1,0 +1,5 @@
+# Local credentials and database backups never belong in Git.
+secrets/*
+!secrets/README.md
+backups/*
+!backups/README.md

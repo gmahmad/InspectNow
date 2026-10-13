@@ -1,0 +1,21 @@
+Changes relative to Stage 2
+
+NEW .dockerignore
+UPDATED .github/workflows/ci.yml
+NEW Dockerfile
+NEW InspectNow.Api/Configuration/DatabaseConnectionString.cs
+UPDATED InspectNow.Api/Program.cs
+NEW InspectNow.Api/Stage3.http
+NEW InspectNow.Tests/Configuration/DatabaseConnectionStringTests.cs
+UPDATED README.md
+NEW STAGE3_UPDATE.md
+NEW compose.yaml
+NEW docker/.gitattributes
+NEW docker/.gitignore
+NEW docker/backups/README.md
+NEW docker/init-db.sh
+NEW docker/secrets/README.md
+UPDATED docs/PROJECT_GUIDE.docx
+UPDATED docs/PROJECT_GUIDE.md
+
+No old files need deleting. Domain, Application, Infrastructure, mappings and migrations unchanged.

@@ -1,0 +1,25 @@
+# Allow only the four application projects into the build context.
+**
+!Dockerfile
+!global.json
+!InspectNow.Api/
+!InspectNow.Api/**
+!InspectNow.Application/
+!InspectNow.Application/**
+!InspectNow.Domain/
+!InspectNow.Domain/**
+!InspectNow.Infrastructure/
+!InspectNow.Infrastructure/**
+**/bin/
+**/obj/
+**/.vs/
+**/.git/
+**/secrets.json
+**/.env
+**/.env.*
+**/*.pfx
+**/*.p12
+**/*.pem
+**/appsettings*.json
+!InspectNow.Api/appsettings.json
+!InspectNow.Api/appsettings.Development.json

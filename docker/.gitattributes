@@ -1,0 +1,2 @@
+# Preserve Linux script line endings when cloning on Windows.
+*.sh text eol=lf

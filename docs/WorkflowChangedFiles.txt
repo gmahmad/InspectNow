@@ -1,0 +1,32 @@
+CHANGED from numeric-ID package
+InspectNow.Api/Controllers/InspectionsController.cs
+InspectNow.Api/Program.cs
+InspectNow.Application/Inspections/IInspectionRepository.cs
+InspectNow.Application/Inspections/InspectionDetailsResult.cs
+InspectNow.Application/Inspections/InspectionQuestionResult.cs
+InspectNow.Domain/Templates/Inspection.cs
+InspectNow.Infrastructure/Persistence/Configurations/InspectionConfiguration.cs
+InspectNow.Infrastructure/Persistence/Migrations/InspectNowDbContextModelSnapshot.cs
+InspectNow.Infrastructure/Persistence/Repositories/InspectionRepository.cs
+InspectNow.Tests/Integration/TemplateLifecycleTests.cs
+
+ADDED
+InspectNow.Api/Contracts/Inspections/SaveInspectionAnswerRequest.cs
+InspectNow.Api/Contracts/Inspections/SaveInspectionAnswerResponse.cs
+InspectNow.Api/Contracts/Inspections/SubmitInspectionRequest.cs
+InspectNow.Api/Contracts/Inspections/SubmitInspectionResponse.cs
+InspectNow.Api/InspectionWorkflow.http
+InspectNow.Application/Inspections/SaveInspectionAnswer.cs
+InspectNow.Application/Inspections/SaveInspectionAnswerResult.cs
+InspectNow.Application/Inspections/SubmitInspection.cs
+InspectNow.Application/Inspections/SubmitInspectionResult.cs
+InspectNow.Infrastructure/Persistence/Migrations/20261008123000_AddInspectionSubmission.Designer.cs
+InspectNow.Infrastructure/Persistence/Migrations/20261008123000_AddInspectionSubmission.cs
+InspectNow.Tests/Inspection/InspectionSubmissionTests.cs
+InspectNow.Tests/Inspection/InspectionUseCaseTests.cs
+InspectNow.Tests/Integration/InspectionWorkflowTests.cs
+InspectNow.Tests/Integration/PostgresCollection.cs
+InspectNow.Tests/Support/InspectionFixture.cs
+WORKFLOW_UPDATE.md
+
+No existing files need deletion.
