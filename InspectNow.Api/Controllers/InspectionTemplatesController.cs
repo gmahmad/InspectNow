@@ -1,10 +1,13 @@
 using InspectNow.Api.Contracts.Templates;
 using InspectNow.Application.Templates;
+using InspectNow.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InspectNow.Api.Controllers;
 
 [ApiController]
+[Authorize(Policy = OrganizationAccess.Policy)]
 [Route("api/inspection-templates")]
 public sealed class InspectionTemplatesController : ControllerBase
 {

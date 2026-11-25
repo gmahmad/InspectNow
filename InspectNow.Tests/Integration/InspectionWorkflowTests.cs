@@ -6,7 +6,6 @@ using InspectNow.Application.Inspections;
 using InspectNow.Application.Templates;
 using InspectNow.Domain.Inspections;
 using InspectNow.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,10 +18,7 @@ public sealed class InspectionWorkflowTests
     public async Task AnswerAndSubmit_EnforcesValidationVersionsAndFinality()
     {
         using var factory = new InspectNowApiFactory();
-        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false
-        });
+        using var client = await factory.CreateMemberClientAsync();
         await using (var scope = factory.Services.CreateAsyncScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
@@ -129,15 +125,15 @@ public sealed class InspectionWorkflowTests
 
         // Different contexts: a late answer cannot overwrite a concurrent submission.
         await using var setupScope = factory.Services.CreateAsyncScope();
-        var setupDb = setupScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+        var setupDb = InspectNowApiFactory.GetMemberDb(setupScope.ServiceProvider, client);
         var setup = await setupDb.Inspections.Include(i => i.Questions).SingleAsync(i => i.Id == other.Id);
         var requiredId = setup.Questions.Single(q => q.IsRequired).Id;
         setup.AnswerQuestion(requiredId, InspectionAnswer.Pass, null);
         await setupDb.SaveChangesAsync();
         await using var answerScope = factory.Services.CreateAsyncScope();
         await using var submitScope = factory.Services.CreateAsyncScope();
-        var answerDb = answerScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
-        var submitDb = submitScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+        var answerDb = InspectNowApiFactory.GetMemberDb(answerScope.ServiceProvider, client);
+        var submitDb = InspectNowApiFactory.GetMemberDb(submitScope.ServiceProvider, client);
         var editing = await answerDb.Inspections.Include(i => i.Questions).SingleAsync(i => i.Id == other.Id);
         var submitting = await submitDb.Inspections.Include(i => i.Questions).SingleAsync(i => i.Id == other.Id);
         submitting.Submit(DateTimeOffset.UtcNow);

@@ -1,3 +1,6 @@
+using System.Net.Http.Headers;
+using InspectNow.Api.Authorization;
+using InspectNow.Domain.Organizations;
 using InspectNow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -14,6 +17,36 @@ namespace InspectNow.Tests.Integration;
 public sealed class InspectNowApiFactory
     : WebApplicationFactory<Program>
 {
+    public static InspectNowDbContext GetMemberDb(IServiceProvider services, HttpClient client)
+    {
+        var value = client.DefaultRequestHeaders.GetValues(OrganizationAccess.Header).Single();
+        services.GetRequiredService<OrganizationScope>().Select(
+            long.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
+        return services.GetRequiredService<InspectNowDbContext>();
+    }
+
+    public async Task<HttpClient> CreateMemberClientAsync()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+        await db.Database.MigrateAsync();
+        var organization = new Organization($"Test organization {Guid.NewGuid():N}");
+        db.Organizations.Add(organization);
+        await db.SaveChangesAsync();
+
+        var subject = Guid.NewGuid().ToString("N");
+        db.OrganizationMemberships.Add(new OrganizationMembership(organization.Id, TestTokens.Issuer, subject));
+        await db.SaveChangesAsync();
+
+        var client = CreateClient(new WebApplicationFactoryClientOptions
+        {
+            BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false
+        });
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TestTokens.Issue(subject));
+        client.DefaultRequestHeaders.Add(OrganizationAccess.Header, organization.Id.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return client;
+    }
+
     protected override void ConfigureWebHost(
         IWebHostBuilder builder)
     {
@@ -44,6 +77,7 @@ public sealed class InspectNowApiFactory
 
         builder.ConfigureTestServices(services =>
         {
+            TestTokens.Configure(services);
             services.RemoveAll<InspectNowDbContext>();
 
             services.RemoveAll<

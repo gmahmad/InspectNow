@@ -13,7 +13,7 @@ public sealed class InspectionRepository : IInspectionRepository
         _dbContext = dbContext;
     }
 
-    public void Add(Inspection inspection) => _dbContext.Inspections.Add(inspection);
+    public void Add(Inspection inspection) => _dbContext.AddInspection(inspection);
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {

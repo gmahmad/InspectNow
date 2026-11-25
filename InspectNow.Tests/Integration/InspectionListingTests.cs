@@ -4,7 +4,6 @@ using InspectNow.Application.Inspections;
 using InspectNow.Domain.Inspections;
 using InspectNow.Domain.Templates;
 using InspectNow.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,22 +16,19 @@ public sealed class InspectionListingTests
     public async Task List_FiltersAndPagesInPostgres_WithStableOrderAndLiteralSearch()
     {
         using var factory = new InspectNowApiFactory();
-        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false
-        });
+        using var client = await factory.CreateMemberClientAsync();
         long templateId, firstId, secondId, thirdId;
         var time = new DateTimeOffset(2026, 10, 1, 0, 0, 0, TimeSpan.Zero);
         await using (var scope = factory.Services.CreateAsyncScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+            var db = InspectNowApiFactory.GetMemberDb(scope.ServiceProvider, client);
             await db.Database.MigrateAsync();
             Assert.False(db.Database.HasPendingModelChanges());
             var template = new InspectionTemplate($"List test {Guid.NewGuid():N}");
             template.AddQuestion("Clean?", true);
             template.AddQuestion("Carpet?", false);
             template.Publish();
-            db.InspectionTemplates.Add(template);
+            db.AddTemplate(template);
             await db.SaveChangesAsync();
             templateId = template.Id;
 
@@ -40,11 +36,11 @@ public sealed class InspectionListingTests
             var second = Inspection.Start(template, @"Office 100XYA\West", time.AddHours(1));
             var third = Inspection.Start(template, "Karachi OFFICE", time.AddHours(1));
             // Save separately so the Id tie-break expectation does not rely on insert batching order.
-            db.Inspections.Add(first);
+            db.AddInspection(first);
             await db.SaveChangesAsync();
-            db.Inspections.Add(second);
+            db.AddInspection(second);
             await db.SaveChangesAsync();
-            db.Inspections.Add(third);
+            db.AddInspection(third);
             await db.SaveChangesAsync();
             firstId = first.Id; secondId = second.Id; thirdId = third.Id;
             first.AnswerQuestion(first.Questions.Single(q => q.IsRequired).Id, InspectionAnswer.Pass, null);

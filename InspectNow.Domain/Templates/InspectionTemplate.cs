@@ -5,6 +5,7 @@ public sealed class InspectionTemplate
     public const int MaxNameLength = 200;
 
     public long Id { get; private set; }
+    public long OrganizationId { get; private set; }
     public string Name { get; private set; }
     public TemplateStatus Status { get; private set; }
 

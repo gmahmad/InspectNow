@@ -9,6 +9,8 @@ GET {{host}}/health/ready
 
 ### Verify migrations by creating a record (expect 201)
 POST {{host}}/api/inspection-templates
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -17,10 +19,14 @@ Content-Type: application/json
 
 ### Replace templateId above with the returned id; expect 200
 GET {{host}}/api/inspection-templates/{{templateId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Existing inspection listing in the container database
 GET {{host}}/api/inspections?page=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### OpenAPI document in the local Development container

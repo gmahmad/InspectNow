@@ -8,6 +8,9 @@ using InspectNow.Application.Templates;
 using InspectNow.Infrastructure.Persistence;
 using InspectNow.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
+using InspectNow.Api.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 // --migrate runs an explicit one-shot database job without starting HTTP.
 var migrateOnly = args.Contains("--migrate", StringComparer.Ordinal);
@@ -19,6 +22,16 @@ var connectionString = DatabaseConnectionString.Resolve(builder.Configuration);
 
 builder.Services.AddDbContext<InspectNowDbContext>(options =>
     options.UseNpgsql(connectionString));
+builder.Services.AddScoped<OrganizationScope>();
+builder.Services.AddScoped<IAuthorizationHandler, OrganizationAccessHandler>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["Authentication:Authority"];
+    options.Audience = builder.Configuration["Authentication:Audience"];
+    options.MapInboundClaims = false;
+});
+builder.Services.AddAuthorizationBuilder().AddPolicy(OrganizationAccess.Policy, policy =>
+    policy.RequireAuthenticatedUser().AddRequirements(new OrganizationAccess()));
 
 builder.Services.AddScoped<
     IInspectionTemplateRepository,
@@ -81,6 +94,7 @@ app.UseStatusCodePages();
 if (app.Configuration.GetValue("Http:UseHttpsRedirection", true))
     app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions

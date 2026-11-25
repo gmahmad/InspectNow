@@ -10,8 +10,14 @@ Accept: application/json
 @templateId = 1
 @inspectionId = 1
 
+### List my organizations
+GET {{baseUrl}}/api/organizations
+Authorization: Bearer {{accessToken}}
+
 ### Create a draft inspection template
 POST {{baseUrl}}/api/inspection-templates
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -20,6 +26,8 @@ Content-Type: application/json
 
 ### Reject a blank name
 POST {{baseUrl}}/api/inspection-templates
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -28,14 +36,20 @@ Content-Type: application/json
 
 ### Retrieve the template already created
 GET {{baseUrl}}/api/inspection-templates/{{templateId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Request a nonexistent template
 GET {{baseUrl}}/api/inspection-templates/9223372036854775807
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Add a question to our existing draft
 POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -45,6 +59,8 @@ Content-Type: application/json
 
 ### Reject blank question text
 POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -54,6 +70,8 @@ Content-Type: application/json
 
 ### Handle a missing template
 POST {{baseUrl}}/api/inspection-templates/9223372036854775807/questions
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -63,17 +81,25 @@ Content-Type: application/json
 
 ### Get the template with its questions
 GET {{baseUrl}}/api/inspection-templates/{{templateId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Publish our template
 POST {{baseUrl}}/api/inspection-templates/{{templateId}}/publish
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Read the published template
 GET {{baseUrl}}/api/inspection-templates/{{templateId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Reject adding a question after publishing
 POST {{baseUrl}}/api/inspection-templates/{{templateId}}/questions
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -83,30 +109,48 @@ Content-Type: application/json
 
 ### Reject publishing a missing template
 POST {{baseUrl}}/api/inspection-templates/9223372036854775807/publish
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### All templates, using default pagination
 GET {{baseUrl}}/api/inspection-templates
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Published templates only
 GET {{baseUrl}}/api/inspection-templates?status=Published&page=1&pageSize=10
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Draft templates, one per page
 GET {{baseUrl}}/api/inspection-templates?status=Draft&page=1&pageSize=1
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Second page of drafts
 GET {{baseUrl}}/api/inspection-templates?status=Draft&page=2&pageSize=1
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Invalid page
 GET {{baseUrl}}/api/inspection-templates?page=0
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Excessive page size
 GET {{baseUrl}}/api/inspection-templates?pageSize=101
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Invalid status
 GET {{baseUrl}}/api/inspection-templates?status=Unknown
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 
 ### Start an inspection from our published template
 POST {{baseUrl}}/api/inspections
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -116,9 +160,13 @@ Content-Type: application/json
 
 ### Retrieve an inspection
 GET {{baseUrl}}/api/inspections/{{inspectionId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### Missing inspection
 GET {{baseUrl}}/api/inspections/9223372036854775807
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 

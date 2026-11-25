@@ -17,7 +17,7 @@ public sealed class InspectionTemplateRepository
 
     public void Add(InspectionTemplate template)
     {
-        _dbContext.InspectionTemplates.Add(template);
+        _dbContext.AddTemplate(template);
     }
 
     public async Task SaveChangesAsync(

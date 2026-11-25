@@ -51,6 +51,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
       Http__UseHttpsRedirection: "false"
+      Authentication__Authority: ${INSPECTNOW_AUTHORITY:-}
+      Authentication__Audience: ${INSPECTNOW_AUDIENCE:-}
       ConnectionStrings__InspectNow: Host=db;Port=5432;Database=inspectnow;Username=inspectnow_app
       Database__PasswordFile: /run/secrets/app_db_password
     secrets:

@@ -70,13 +70,15 @@ jobs:
         run: |
           docker compose -p inspectnow-ci config --quiet
           docker compose -p inspectnow-ci up --build -d
-      - name: Check health and create a record
+      - name: Check health, require authentication, and create a persistence marker
         shell: bash
         run: |
           curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2 --max-time 10 http://localhost:18080/health/ready
           curl --fail --silent --show-error http://localhost:18080/health/live
-          curl --fail --silent --show-error -X POST http://localhost:18080/api/inspection-templates -H 'Content-Type: application/json' -d '{"name":"CI container inspection"}' -o /tmp/inspectnow-created.json
-          python3 -c 'import json; d=json.load(open("/tmp/inspectnow-created.json")); assert d["id"] > 0'
+          status=$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' http://localhost:18080/api/inspection-templates)
+          test "$status" = 401
+          docker compose -p inspectnow-ci exec -T db psql -v ON_ERROR_STOP=1 -U inspectnow_admin -d inspectnow \
+            -c "INSERT INTO \"Organizations\" (\"Name\") VALUES ('CI persistence marker')"
       - name: Verify data survives container recreation
         shell: bash
         run: |
@@ -84,9 +86,9 @@ jobs:
           docker compose -p inspectnow-ci down
           docker compose -p inspectnow-ci up -d
           curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2 --max-time 10 http://localhost:18080/health/ready
-          template_id=$(python3 -c 'import json; print(json.load(open("/tmp/inspectnow-created.json"))["id"])')
-          curl --fail --silent --show-error "http://localhost:18080/api/inspection-templates/$template_id" -o /tmp/inspectnow-loaded.json
-          python3 -c 'import json; a=json.load(open("/tmp/inspectnow-created.json")); b=json.load(open("/tmp/inspectnow-loaded.json")); assert b["id"] == a["id"] and b["name"] == a["name"]'
+          marker_count=$(docker compose -p inspectnow-ci exec -T db psql -v ON_ERROR_STOP=1 -qAt -U inspectnow_admin -d inspectnow \
+            -c "SELECT count(*) FROM \"Organizations\" WHERE \"Name\" = 'CI persistence marker'")
+          test "$marker_count" = 1
       - name: Container logs on failure
         if: failure()
         run: docker compose -p inspectnow-ci logs --no-color

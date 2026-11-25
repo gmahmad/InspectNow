@@ -10,6 +10,8 @@
 
 ### 1. Start an inspection from an existing published template (201)
 POST {{baseUrl}}/api/inspections
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -19,10 +21,14 @@ Content-Type: application/json
 
 ### 2. Read questions + current version (200). Update variables above.
 GET {{baseUrl}}/api/inspections/{{inspectionId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### 3. Save an answer (200). Replace expectedVersion with returned version.
 PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -33,6 +39,8 @@ Content-Type: application/json
 
 ### 4. Simulate a stale screen (409): staleVersion must be an OLD nonempty version.
 PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -44,6 +52,8 @@ Content-Type: application/json
 ### 5. Submit (200 after all required questions are answered; otherwise 409).
 # Use latest expectedVersion. Fail is a completed answer, not a submission blocker.
 POST {{baseUrl}}/api/inspections/{{inspectionId}}/submit
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -52,10 +62,14 @@ Content-Type: application/json
 
 ### 6. Verify Submitted status, UTC timestamp, answers and new version (200)
 GET {{baseUrl}}/api/inspections/{{inspectionId}}
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Accept: application/json
 
 ### 7. Try editing a submitted inspection (409)
 PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -65,6 +79,8 @@ Content-Type: application/json
 
 ### Missing version (400)
 PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {
@@ -73,6 +89,8 @@ Content-Type: application/json
 
 ### Unknown answer (400)
 PUT {{baseUrl}}/api/inspections/{{inspectionId}}/questions/{{questionId}}/answer
+Authorization: Bearer {{accessToken}}
+X-Organization-Id: {{organizationId}}
 Content-Type: application/json
 
 {

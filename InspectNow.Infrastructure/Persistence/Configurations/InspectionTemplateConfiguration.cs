@@ -1,4 +1,5 @@
 using InspectNow.Domain.Templates;
+using InspectNow.Domain.Organizations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,6 +14,10 @@ public sealed class InspectionTemplateConfiguration
         builder.ToTable("InspectionTemplates");
 
         builder.HasKey(t => t.Id);
+        builder.Property<long>("OrganizationId");
+        builder.HasOne<Organization>().WithMany().HasForeignKey("OrganizationId")
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasAlternateKey("OrganizationId", nameof(InspectionTemplate.Id));
 
         builder.Property(t => t.Id)
             .UseIdentityByDefaultColumn();

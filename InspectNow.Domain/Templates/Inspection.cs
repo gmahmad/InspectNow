@@ -9,6 +9,7 @@ public sealed class Inspection
     private readonly List<InspectionQuestion> _questions = new();
 
     public long Id { get; private set; }
+    public long OrganizationId { get; private set; }
     public long TemplateId { get; private set; }
     public Guid TemplateVersion { get; private set; }
 

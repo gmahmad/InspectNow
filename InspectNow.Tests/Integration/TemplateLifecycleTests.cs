@@ -6,7 +6,6 @@ using InspectNow.Application.Inspections;
 using InspectNow.Domain.Inspections;
 using InspectNow.Application.Templates;
 using InspectNow.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -22,12 +21,7 @@ public sealed class TemplateLifecycleTests
         // Arrange: start the API against the test database.
         using var factory = new InspectNowApiFactory();
 
-        using var client = factory.CreateClient(
-            new WebApplicationFactoryClientOptions
-            {
-                BaseAddress = new Uri("https://localhost"),
-                AllowAutoRedirect = false
-            });
+        using var client = await factory.CreateMemberClientAsync();
 
         await using (var scope =
             factory.Services.CreateAsyncScope())
@@ -133,11 +127,7 @@ public sealed class TemplateLifecycleTests
     public async Task NumericIds_PersistSnapshotsAnswersAndConcurrency()
     {
         using var factory = new InspectNowApiFactory();
-        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            BaseAddress = new Uri("https://localhost"),
-            AllowAutoRedirect = false
-        });
+        using var client = await factory.CreateMemberClientAsync();
 
         await using (var scope = factory.Services.CreateAsyncScope())
         {
@@ -188,11 +178,11 @@ public sealed class TemplateLifecycleTests
         Assert.NotEqual(first.Id, second.Id);
         Assert.NotEqual(first.Questions[0].Id, second.Questions[0].Id);
 
-        // Exercise the domain and mapping directly; the answer endpoint is the next lesson.
+        // Exercise concurrent edits through two independently tracked database contexts.
         await using var firstScope = factory.Services.CreateAsyncScope();
         await using var secondScope = factory.Services.CreateAsyncScope();
-        var firstDb = firstScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
-        var secondDb = secondScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+        var firstDb = InspectNowApiFactory.GetMemberDb(firstScope.ServiceProvider, client);
+        var secondDb = InspectNowApiFactory.GetMemberDb(secondScope.ServiceProvider, client);
         var firstEdit = await firstDb.Inspections.Include(i => i.Questions)
             .SingleAsync(i => i.Id == first.Id);
         var staleEdit = await secondDb.Inspections.Include(i => i.Questions)
@@ -204,7 +194,7 @@ public sealed class TemplateLifecycleTests
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(() => secondDb.SaveChangesAsync());
 
         await using var verifyScope = factory.Services.CreateAsyncScope();
-        var verifyDb = verifyScope.ServiceProvider.GetRequiredService<InspectNowDbContext>();
+        var verifyDb = InspectNowApiFactory.GetMemberDb(verifyScope.ServiceProvider, client);
         var saved = await verifyDb.Inspections.Include(i => i.Questions)
             .SingleAsync(i => i.Id == first.Id);
         Assert.Equal(InspectionAnswer.Fail, Assert.Single(saved.Questions).Answer);

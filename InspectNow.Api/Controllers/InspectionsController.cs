@@ -1,10 +1,13 @@
 using InspectNow.Api.Contracts.Inspections;
 using InspectNow.Application.Inspections;
+using InspectNow.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InspectNow.Api.Controllers;
 
 [ApiController]
+[Authorize(Policy = OrganizationAccess.Policy)]
 [Route("api/inspections")]
 public sealed class InspectionsController : ControllerBase
 {

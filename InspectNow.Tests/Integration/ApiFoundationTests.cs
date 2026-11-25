@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using InspectNow.Application.Inspections;
+using InspectNow.Api.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -71,6 +73,7 @@ public sealed class ApiFoundationTests
             BaseAddress = new Uri("https://localhost"), AllowAutoRedirect = false
         });
         client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        client.DefaultRequestHeaders.Authorization = new("Bearer", TestTokens.Issue("pipeline-test"));
         return client;
     }
 
@@ -93,6 +96,22 @@ public sealed class ApiFoundationTests
             builder.UseEnvironment("Testing");
             builder.UseSetting("ConnectionStrings:InspectNow",
                 "Host=127.0.0.1;Port=1;Database=inspectnow_tests;Username=unused;Password=unused;Timeout=1;Pooling=false");
+            builder.ConfigureTestServices(services =>
+            {
+                TestTokens.Configure(services);
+                services.Remove(services.Single(descriptor =>
+                    descriptor.ImplementationType == typeof(OrganizationAccessHandler)));
+                services.AddSingleton<IAuthorizationHandler, PassThroughAuthorizationHandler>();
+            });
+        }
+    }
+
+    private sealed class PassThroughAuthorizationHandler : AuthorizationHandler<OrganizationAccess>
+    {
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OrganizationAccess requirement)
+        {
+            context.Succeed(requirement);
+            return Task.CompletedTask;
         }
     }
 
