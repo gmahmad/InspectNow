@@ -12,6 +12,8 @@ The solution uses ASP.NET Core on .NET 10, EF Core, and PostgreSQL. The [project
 
 ## Run the local demo
 
+The React frontend in `InspectNow.Web` opens directly into a working demo with browser-local data. See the [frontend guide](InspectNow.Web/README.md) for how to open it and connect to the API.
+
 With Docker and Compose available, set up the two [local database password files](docker/secrets/README.md), then run these commands from the repository root.
 
 ```powershell
