@@ -1,5 +1,6 @@
 using InspectNow.Api.Contracts.Inspections;
 using InspectNow.Application.Inspections;
+using InspectNow.Domain.Organizations;
 using InspectNow.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace InspectNow.Api.Controllers;
 
 [ApiController]
 [Authorize(Policy = OrganizationAccess.Policy)]
+[RequireWorkspaceModule(WorkspaceModules.Inspections)]
 [Route("api/inspections")]
 public sealed class InspectionsController : ControllerBase
 {
@@ -23,6 +25,7 @@ public sealed class InspectionsController : ControllerBase
     }
 
     [HttpPost]
+    [ManagerOnly]
     [ProducesResponseType(
         typeof(StartInspectionResponse),
         StatusCodes.Status201Created)]

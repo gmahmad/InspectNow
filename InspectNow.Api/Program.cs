@@ -11,10 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using InspectNow.Api.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.RateLimiting;
 
 // --migrate runs an explicit one-shot database job without starting HTTP.
 var migrateOnly = args.Contains("--migrate", StringComparer.Ordinal);
-var hostArgs = args.Where(arg => arg != "--migrate").ToArray();
+var seedBusinessDemo = args.Contains("--seed-business-demo", StringComparer.Ordinal);
+var hostArgs = args.Where(arg => arg is not ("--migrate" or "--seed-business-demo")).ToArray();
 var builder = WebApplication.CreateBuilder(hostArgs);
 var connectionString = DatabaseConnectionString.Resolve(builder.Configuration);
 
@@ -23,15 +27,60 @@ var connectionString = DatabaseConnectionString.Resolve(builder.Configuration);
 builder.Services.AddDbContext<InspectNowDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddScoped<OrganizationScope>();
+builder.Services.AddSingleton<PlatformOwner>();
 builder.Services.AddScoped<IAuthorizationHandler, OrganizationAccessHandler>();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+builder.Services.AddIdentityCore<IdentityUser>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequiredLength = 12;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+}).AddEntityFrameworkStores<InspectNowDbContext>().AddSignInManager();
+var authentication = builder.Services.AddAuthentication("InspectNow")
+    .AddPolicyScheme("InspectNow", null, options =>
+    {
+        options.ForwardDefaultSelector = context => context.Request.Headers.ContainsKey("Authorization")
+            ? JwtBearerDefaults.AuthenticationScheme : IdentityConstants.ApplicationScheme;
+    })
+    .AddJwtBearer(options =>
 {
     options.Authority = builder.Configuration["Authentication:Authority"];
     options.Audience = builder.Configuration["Authentication:Audience"];
     options.MapInboundClaims = false;
 });
-builder.Services.AddAuthorizationBuilder().AddPolicy(OrganizationAccess.Policy, policy =>
-    policy.RequireAuthenticatedUser().AddRequirements(new OrganizationAccess()));
+authentication.AddIdentityCookies();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Events.OnRedirectToLogin = context => { context.Response.StatusCode = 401; return Task.CompletedTask; };
+    options.Events.OnRedirectToAccessDenied = context => { context.Response.StatusCode = 403; return Task.CompletedTask; };
+});
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-Token";
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("account", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 15,
+            Window = TimeSpan.FromMinutes(1)
+        }));
+    options.AddPolicy("public-form", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 60,
+            Window = TimeSpan.FromMinutes(1)
+        }));
+});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("LocalAccount", policy => policy.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme).RequireAuthenticatedUser())
+    .AddPolicy(OrganizationAccess.Policy, policy =>
+        policy.RequireAuthenticatedUser().AddRequirements(new OrganizationAccess()));
 
 builder.Services.AddScoped<
     IInspectionTemplateRepository,
@@ -68,6 +117,14 @@ builder.Services.AddOpenApi();
 
 await using var app = builder.Build();
 
+if (seedBusinessDemo)
+{
+    if (migrateOnly) throw new InvalidOperationException("Run migrations before seeding the business demo.");
+    await BusinessDemoSeeder.Seed(app.Services, app.Configuration, app.Environment);
+    app.Logger.LogInformation("Business demo workspaces are ready.");
+    return;
+}
+
 if (migrateOnly)
 {
     await using var scope = app.Services.CreateAsyncScope();
@@ -95,7 +152,24 @@ if (app.Configuration.GetValue("Http:UseHttpsRedirection", true))
     app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    var request = context.Request;
+    if (request.Path.StartsWithSegments("/api") && !HttpMethods.IsGet(request.Method) &&
+        !HttpMethods.IsHead(request.Method) && !HttpMethods.IsOptions(request.Method) &&
+        (request.Path.StartsWithSegments("/api/account") || !request.Headers.ContainsKey("Authorization")))
+    {
+        var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+        if (!await antiforgery.IsRequestValidAsync(context))
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+    }
+    await next(context);
+});
 
 app.MapHealthChecks("/health/live", new HealthCheckOptions
 {

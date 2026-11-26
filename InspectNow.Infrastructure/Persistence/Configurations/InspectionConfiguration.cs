@@ -14,6 +14,10 @@ public sealed class InspectionConfiguration
         builder.ToTable("Inspections");
 
         builder.HasKey(i => i.Id);
+        builder.Property(i => i.AssignedToUserId).HasMaxLength(255);
+        builder.HasIndex(i => new { i.OrganizationId, i.AssignedToUserId });
+        builder.HasOne<Site>().WithMany().HasForeignKey(i => new { i.OrganizationId, i.SiteId })
+            .HasPrincipalKey(site => new { site.OrganizationId, site.Id }).OnDelete(DeleteBehavior.Restrict);
         builder.Property<long>("OrganizationId");
         builder.HasOne<Organization>().WithMany().HasForeignKey("OrganizationId")
             .OnDelete(DeleteBehavior.Restrict);

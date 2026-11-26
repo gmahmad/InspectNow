@@ -1,8 +1,12 @@
 # InspectNow
 
-InspectNow is a backend for teams that run repeatable site inspections. A team can publish a checklist, start an inspection from it, record results, and submit a completed inspection. Each inspection keeps a snapshot of its checklist so the original questions remain visible in the inspection record.
+InspectNow is a business forms platform for replacing recurring paper workflows. Teams can build and publish reusable forms, fill them on phones, and review submissions in a workspace response library. [Forms platform guide](docs/FORMS_PLATFORM.md)
+
+The inspection module covers recurring site checks. Each inspection keeps a snapshot of its checklist so the original questions remain visible in the inspection record.
 
 ## What works today
+
+- Build and publish reusable forms with sections and typed questions, save progress, and review submitted responses in a workspace library.
 
 - Create a template, add questions, and publish it for use in inspections.
 - Start an inspection at a site, save answers, and submit once all required questions have a Pass or Fail result.
@@ -13,6 +17,8 @@ The solution uses ASP.NET Core on .NET 10, EF Core, and PostgreSQL. The [project
 ## Run the local demo
 
 The React frontend in `InspectNow.Web` opens directly into a working demo with browser-local data. See the [frontend guide](InspectNow.Web/README.md) for how to open it and connect to the API.
+
+For real teams, the [team workflow guide](docs/TEAM_WORKFLOW.md) covers account creation, invitations, sites, and inspection assignments.
 
 With Docker and Compose available, set up the two [local database password files](docker/secrets/README.md), then run these commands from the repository root.
 

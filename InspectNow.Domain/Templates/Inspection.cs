@@ -10,6 +10,20 @@ public sealed class Inspection
 
     public long Id { get; private set; }
     public long OrganizationId { get; private set; }
+    public long? SiteId { get; private set; }
+    public string? AssignedToUserId { get; private set; }
+    public DateOnly? DueDate { get; private set; }
+
+    public void Assign(long siteId, string assignee, DateOnly dueDate)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(siteId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(assignee);
+        if (Status != InspectionStatus.Draft || SiteId.HasValue)
+            throw new InvalidOperationException("Only a new draft can be assigned.");
+        SiteId = siteId;
+        AssignedToUserId = assignee;
+        DueDate = dueDate;
+    }
     public long TemplateId { get; private set; }
     public Guid TemplateVersion { get; private set; }
 

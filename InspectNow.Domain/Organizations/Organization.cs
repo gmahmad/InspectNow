@@ -6,8 +6,9 @@ public sealed class Organization
 
     public long Id { get; private set; }
     public string Name { get; private set; }
+    public OrganizationType Type { get; private set; }
 
-    public Organization(string name)
+    public Organization(string name, OrganizationType type = OrganizationType.General)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -20,5 +21,6 @@ public sealed class Organization
         }
 
         Name = trimmedName;
+        Type = type;
     }
 }

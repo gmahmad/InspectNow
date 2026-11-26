@@ -5,6 +5,27 @@
     <Project Path="InspectNow.Domain/InspectNow.Domain.csproj" />
     <Project Path="InspectNow.Infrastructure/InspectNow.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/InspectNow.Web/">
+    <File Path="InspectNow.Web/README.md" />
+    <File Path="InspectNow.Web/index.html" />
+    <File Path="InspectNow.Web/package.json" />
+    <File Path="InspectNow.Web/pnpm-lock.yaml" />
+    <File Path="InspectNow.Web/pnpm-workspace.yaml" />
+    <File Path="InspectNow.Web/start-visual-studio.cmd" />
+    <File Path="InspectNow.Web/vite.config.js" />
+  </Folder>
+  <Folder Name="/src/InspectNow.Web/src/">
+    <File Path="InspectNow.Web/src/components.jsx" />
+    <File Path="InspectNow.Web/src/corrective.jsx" />
+    <File Path="InspectNow.Web/src/forms.jsx" />
+    <File Path="InspectNow.Web/src/forms-data.js" />
+    <File Path="InspectNow.Web/src/main.jsx" />
+    <File Path="InspectNow.Web/src/routes.js" />
+    <File Path="InspectNow.Web/src/styles.css" />
+    <File Path="InspectNow.Web/src/team.jsx" />
+    <File Path="InspectNow.Web/src/workspace.js" />
+    <File Path="InspectNow.Web/src/workspace.test.js" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="InspectNow.Tests/InspectNow.Tests.csproj" />
   </Folder>

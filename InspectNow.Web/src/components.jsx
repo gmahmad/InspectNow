@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertCircle, Check, ClipboardList, FileText, LoaderCircle, Plus, X } from 'lucide-react';
+import { AlertCircle, Check, ChevronLeft, ClipboardList, FileText, LoaderCircle, Plus, X } from 'lucide-react';
 import { canSubmit, createApiWorkspace, inspectProgress, statusLabel } from './workspace.js';
 
 export function Badge({ status, label = status }) {
@@ -26,6 +26,18 @@ export function Loading() {
   return <div className="loading" role="status"><LoaderCircle size={18} /> Loading workspace…</div>;
 }
 
+export function WorkPage({ title, description, back, backLabel, children, layout = 'standard' }) {
+  const heading = useRef(null);
+  useEffect(() => { heading.current?.focus({ preventScroll: true }); }, []);
+  return <section className={`work-page ${layout}`} aria-labelledby="work-page-title">
+    {back && <a className="work-back" href={back}><ChevronLeft size={17} />{backLabel}</a>}
+    <header className="work-heading">
+      <div><h1 id="work-page-title" ref={heading} tabIndex={-1}>{title}</h1>{description && <p>{description}</p>}</div>
+    </header>
+    {children}
+  </section>;
+}
+
 export function Modal({ title, description, children, onClose, wide = false }) {
   const dialog = useRef(null);
   useEffect(() => {
@@ -44,7 +56,7 @@ export function Modal({ title, description, children, onClose, wide = false }) {
   </dialog>;
 }
 
-function useAction() {
+export function useAction() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   async function run(action) {
@@ -81,7 +93,7 @@ export function CreateRecord({ kind, workspace, templates, onCreated, onClose })
   </form>;
 }
 
-export function TemplateEditor({ record, workspace, reload }) {
+export function TemplateEditor({ record, workspace, reload, canManage }) {
   const [text, setText] = useState('');
   const [required, setRequired] = useState(true);
   const { busy, error, run } = useAction();
@@ -91,7 +103,7 @@ export function TemplateEditor({ record, workspace, reload }) {
     {record.questions.length ? <ol className="question-list">{record.questions.map(question => <li key={question.id}>
       <FileText size={17} /><span>{question.text}</span><small>{question.isRequired ? 'Required' : 'Optional'}</small>
     </li>)}</ol> : <Empty icon={FileText} title="Add the first question">Questions will appear in inspections started from this checklist.</Empty>}
-    {record.status === 'Draft' && <>
+    {record.status === 'Draft' && canManage && <>
       <form className="form-stack question-form" onSubmit={event => {
         event.preventDefault();
         run(async () => {
@@ -132,7 +144,7 @@ function AnswerForm({ question, disabled, save, markEdited }) {
   </form>;
 }
 
-export function InspectionEditor({ record, workspace, reload }) {
+export function InspectionEditor({ record, workspace, reload, onCorrectiveAction }) {
   const { busy, error, run } = useAction();
   const [editedQuestions, setEditedQuestions] = useState([]);
   const markEdited = useCallback((id, edited) => {
@@ -149,6 +161,8 @@ export function InspectionEditor({ record, workspace, reload }) {
     <div className="form-stack">{record.questions.map(question => finalized ? <div className="answer-card result" key={question.id}>
       <strong>{question.text}</strong><span>{question.answer === 'NotApplicable' ? 'N/A' : question.answer ?? 'Unanswered'}</span>
       {question.comment && <p>{question.comment}</p>}
+      {question.answer === 'Fail' && onCorrectiveAction &&
+        <button className="button secondary small" onClick={() => onCorrectiveAction(record, question)}>Assign corrective action</button>}
     </div> : <AnswerForm key={question.id} question={question} disabled={busy} markEdited={markEdited} save={input => run(async () => {
       await workspace.answer(record.id, question.id, { ...input, expectedVersion: record.version });
       await reload();

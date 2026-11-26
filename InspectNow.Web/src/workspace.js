@@ -1,3 +1,5 @@
+import { createDemoForms } from './forms-data.js';
+
 const demoKey = 'inspectnow-demo-v1';
 
 export const statusLabel = status => status === 'Draft' ? 'In progress' : status;
@@ -67,6 +69,7 @@ export function createDemoWorkspace(storage = localStorage) {
   const save = () => storage.setItem(demoKey, JSON.stringify(state));
   const nextId = items => Math.max(0, ...items.map(item => item.id)) + 1;
   return {
+    ...createDemoForms(storage),
     async templates() { return structuredClone(state.templates); },
     async inspections() { return structuredClone(state.inspections); },
     async template(id) { return structuredClone(read(state.templates, id)); },
@@ -119,15 +122,21 @@ export function createDemoWorkspace(storage = localStorage) {
 }
 
 export function createApiWorkspace(token, organizationId) {
-  const headers = { Authorization: `Bearer ${token}` };
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
   if (organizationId) headers['X-Organization-Id'] = String(organizationId);
 
   async function request(path, method = 'GET', body) {
     let response;
     try {
+      const requestHeaders = { ...headers };
+      if (!token && method !== 'GET') {
+        const csrf = await request('account/csrf');
+        requestHeaders['X-CSRF-Token'] = csrf.token;
+      }
+      if (body !== undefined) requestHeaders['Content-Type'] = 'application/json';
       response = await fetch(`/api/${path}`, {
         method,
-        headers: body === undefined ? headers : { ...headers, 'Content-Type': 'application/json' },
+        headers: requestHeaders,
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch { throw new Error('InspectNow API is unavailable. Check that the API is running.'); }
@@ -135,7 +144,9 @@ export function createApiWorkspace(token, organizationId) {
     const json = response.headers.get('content-type')?.includes('json');
     if (!response.ok) {
       const problem = json ? await response.json() : null;
-      if (response.status === 401) throw new Error('The access token was rejected. Reconnect with a valid token.');
+      if (response.status === 401) throw new Error(token
+        ? 'The access token was rejected. Reconnect with a valid token.'
+        : problem?.detail ?? 'Sign in to continue.');
       if (response.status === 403) throw new Error('Your account does not have access to this workspace.');
       throw new Error(Object.values(problem?.errors ?? {}).flat()[0] ?? problem?.detail ?? problem?.title ?? `API request failed (${response.status}).`);
     }
@@ -154,7 +165,38 @@ export function createApiWorkspace(token, organizationId) {
   }
 
   return {
+    currentAccount: () => request('account'),
+    signIn: (mode, credentials) => request(`account/${mode}`, 'POST', credentials),
+    signOut: () => request('account/logout', 'POST'),
     organizations: () => request('organizations'),
+    createOrganization: (name, type) => request('organizations', 'POST', { name, type }),
+    joinOrganization: code => request('team/join', 'POST', { code }),
+    members: () => request('team'),
+    roles: () => request('team/roles'),
+    createRole: name => request('team/roles', 'POST', { name }),
+    assignRoles: (id, roleIds) => request(`team/${encodeURIComponent(id)}/roles`, 'PUT', { roleIds }),
+    updateMemberAccess: (id, access) => request(`team/${encodeURIComponent(id)}/access`, 'PUT', access),
+    invite: role => request('team/invitations', 'POST', { role }),
+    sites: () => request('sites'),
+    createSite: name => request('sites', 'POST', { name }),
+    assignments: () => request('assignments'),
+    forms: () => request('forms'),
+    form: id => request(`forms/${id}`),
+    createForm: input => request('forms', 'POST', input),
+    editForm: (id, input) => request(`forms/${id}`, 'PUT', input),
+    updateFormAudience: (id, expectedVersion, audience) => request(`forms/${id}/audience`, 'PUT', { expectedVersion, audience }),
+    publicForm: key => request(`forms/public/${key}`),
+    submitPublicForm: (key, answers) => request(`forms/public/${key}/responses`, 'POST', { answers }),
+    publishForm: (id, expectedVersion) => request(`forms/${id}/publish`, 'POST', { expectedVersion }),
+    formDraft: id => request(`forms/${id}/draft`),
+    saveFormDraft: (id, input) => request(`forms/${id}/draft`, 'PUT', input),
+    formResponses: (page, formId) => request(`forms/responses?page=${page}${formId ? `&formId=${formId}` : ''}`),
+    formResponse: id => request(`forms/responses/${id}`),
+    correctiveActions: () => list('corrective-actions'),
+    createCorrectiveAction: action => request('corrective-actions', 'POST', action),
+    resolveCorrectiveAction: (id, input) => request(`corrective-actions/${id}/resolve`, 'POST', input),
+    reviewCorrectiveAction: (id, input) => request(`corrective-actions/${id}/review`, 'POST', input),
+    createAssignment: assignment => request('assignments', 'POST', assignment),
     templates: () => list('inspection-templates'),
     inspections: () => list('inspections'),
     template: id => request(`inspection-templates/${id}`),

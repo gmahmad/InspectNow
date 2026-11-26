@@ -7,8 +7,21 @@ public sealed class OrganizationMembership
     public long OrganizationId { get; private set; }
     public string Issuer { get; private set; }
     public string Subject { get; private set; }
+    public WorkspaceRole Role { get; private set; }
+    public WorkspaceModules AllowedModules { get; private set; } = WorkspaceModules.All;
+    public Guid[] CustomRoleIds { get; private set; } = [];
 
-    public OrganizationMembership(long organizationId, string issuer, string subject)
+    public void SetCustomRoles(Guid[] ids) => CustomRoleIds = ids;
+
+    public void SetAccess(WorkspaceRole role, WorkspaceModules modules)
+    {
+        if (Role == WorkspaceRole.Admin || role == WorkspaceRole.Admin)
+            throw new InvalidOperationException("Workspace administrators are provisioned by the platform owner.");
+        Role = role;
+        AllowedModules = modules;
+    }
+
+    public OrganizationMembership(long organizationId, string issuer, string subject, WorkspaceRole role = WorkspaceRole.Manager)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(organizationId);
         ValidateIdentityPart(issuer, nameof(issuer));
@@ -16,6 +29,7 @@ public sealed class OrganizationMembership
         OrganizationId = organizationId;
         Issuer = issuer;
         Subject = subject;
+        Role = role;
     }
 
     private static void ValidateIdentityPart(string value, string parameterName)

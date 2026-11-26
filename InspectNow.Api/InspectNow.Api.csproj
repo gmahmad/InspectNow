@@ -5,11 +5,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ae8463dd-719d-4733-82b9-b5c27f8307c8</UserSecretsId>
+    <SpaRoot>../InspectNow.Web/</SpaRoot>
+    <SpaProxyServerUrl>http://127.0.0.1:5176</SpaProxyServerUrl>
+    <SpaProxyLaunchCommand>node node_modules/vite/bin/vite.js --port 5176 --strictPort</SpaProxyLaunchCommand>
+    <SpaProxyLaunchCommand Condition="'$(OS)' == 'Windows_NT'">cmd.exe /d /c start-visual-studio.cmd</SpaProxyLaunchCommand>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -1,5 +1,7 @@
 # Organization access setup
 
+This guide covers external JWT access. To sign in with an InspectNow-managed account in the React app, use the [team workflow guide](TEAM_WORKFLOW.md).
+
 InspectNow accepts signed access tokens from an OpenID Connect provider. Configure an API audience and a client that requests an access token for that audience. The API verifies the token’s signature, issuer, audience, and expiry.
 
 ## Configure the API

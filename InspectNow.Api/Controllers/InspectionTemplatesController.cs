@@ -1,5 +1,6 @@
 using InspectNow.Api.Contracts.Templates;
 using InspectNow.Application.Templates;
+using InspectNow.Domain.Organizations;
 using InspectNow.Api.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ namespace InspectNow.Api.Controllers;
 
 [ApiController]
 [Authorize(Policy = OrganizationAccess.Policy)]
+[RequireWorkspaceModule(WorkspaceModules.Inspections)]
 [Route("api/inspection-templates")]
 public sealed class InspectionTemplatesController : ControllerBase
 {
@@ -23,6 +25,7 @@ public sealed class InspectionTemplatesController : ControllerBase
     }
 
     [HttpPost]
+    [ManagerOnly]
     [ProducesResponseType(
         typeof(CreateTemplateResult),
         StatusCodes.Status201Created)]
@@ -69,6 +72,7 @@ public sealed class InspectionTemplatesController : ControllerBase
     }
 
     [HttpPost("{id:long:min(1)}/questions")]
+    [ManagerOnly]
     [ProducesResponseType(
     typeof(AddTemplateQuestionResponse),
     StatusCodes.Status201Created)]
@@ -123,6 +127,7 @@ public sealed class InspectionTemplatesController : ControllerBase
         }
     }
         [HttpPost("{id:long:min(1)}/publish")]
+        [ManagerOnly]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(
     typeof(ProblemDetails),

@@ -11,6 +11,9 @@ public sealed class OrganizationMembershipConfiguration : IEntityTypeConfigurati
         builder.ToTable("OrganizationMemberships");
         builder.HasKey(membership => new { membership.OrganizationId, membership.Issuer, membership.Subject });
         builder.HasIndex(membership => new { membership.Issuer, membership.Subject });
+        builder.Property(membership => membership.AllowedModules).HasDefaultValue(WorkspaceModules.All)
+            .HasSentinel((WorkspaceModules)(-1)).IsConcurrencyToken();
+        builder.Property(membership => membership.Role).IsConcurrencyToken();
         builder.Property(membership => membership.Issuer)
             .HasMaxLength(OrganizationMembership.MaxIdentityPartLength);
         builder.Property(membership => membership.Subject)
